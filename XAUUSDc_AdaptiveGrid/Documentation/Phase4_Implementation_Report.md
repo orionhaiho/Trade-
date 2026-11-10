@@ -1,6 +1,6 @@
 # Phase 4 — Báo cáo triển khai MQL5
 
-**Trạng thái:** `Implemented` + `Static-reviewed`. **`NOT COMPILED`** — môi trường thực hiện (Linux container) không có MetaTrader 5 / MetaEditor / Wine. Chưa chạy unit test, chưa backtest. Không có hạng mục nào trong tài liệu này được đánh dấu PASS bằng chạy thực tế.
+**Trạng thái:** `Implemented` + `Static-reviewed` + **`Compiled`** (người dùng compile bằng MetaEditor trên máy Windows của họ ngày 2026-11-10, báo **0 errors, 0 warnings**; build MetaEditor chưa ghi nhận). Chưa chạy unit test, chưa backtest, chưa chạy trên Demo.
 
 ---
 
@@ -95,3 +95,9 @@ Code viết theo API MQL5 chuẩn nhưng chưa qua compiler. Các điểm có kh
 - Compile, unit test (script MQL5 dùng `AG_Math.mqh` + test vector Phase 3) — Phase 8.
 - Strategy Tester, stress test, Monte Carlo, walk-forward — Phase 8 (người dùng chạy, hoặc cung cấp kết quả).
 - Tài liệu cài đặt/backtest/tham số đầy đủ, test plan, CSV mẫu — Phase 7–9.
+
+## 8. Kết quả compile
+
+| Ngày | Môi trường | Kết quả | Bằng chứng |
+|---|---|---|---|
+| 2026-11-10 | MetaEditor (MT5 Exness) trên Windows của người dùng; build chưa ghi nhận | 0 errors, 0 warnings | Người dùng báo lại trong phiên làm việc |
