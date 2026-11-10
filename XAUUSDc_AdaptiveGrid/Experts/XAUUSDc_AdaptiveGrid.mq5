@@ -504,13 +504,19 @@ void TryInitialEntry(CBasket &b,CBasket &o,const MqlTick &t,const datetime bar)
       return;
    if(bar<=b.lastProcessedBar)
       return;
-   b.lastProcessedBar=bar;                       // evaluated once per bar, even if rejected
-   MarkSoftDirty();
    if(!g_snap.valid)
      {
+      //--- data not ready yet: do NOT consume the bar, retry on the next tick of the same bar
       LogReject(b,"REJECT_INDICATOR_NOT_READY_"+g_snap.err,0.0,0.0);
       return;
      }
+   if(g_snap.bar1Time!=iTime(g_spec.name,PERIOD_M1,1))
+     {
+      LogReject(b,"REJECT_INDICATOR_NOT_READY_STALE_SNAPSHOT",0.0,0.0);
+      return;
+     }
+   b.lastProcessedBar=bar;                       // evaluated exactly once per bar, with valid closed-bar data
+   MarkSoftDirty();
    bool sig=(b.side==AG_BUY) ? CheckBuySignal(g_snap) : CheckSellSignal(g_snap);
    if(!sig)
       return;

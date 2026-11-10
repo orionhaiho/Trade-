@@ -63,13 +63,15 @@ bool ReadSnapshot(AGIndSnapshot &s)
    int need=MathMax(MathMax(g_cfg.bbPeriod,g_cfg.rsiPeriod),MathMax(g_cfg.adxPeriod*2,g_cfg.atrPeriod))+5;
    if(bars<need)
      { s.err="NOT_ENOUGH_BARS"; return false; }
-   if(BarsCalculated(g_hBB)<bars || BarsCalculated(g_hRSI)<bars || BarsCalculated(g_hADX)<bars || BarsCalculated(g_hATR)<bars)
-     { s.err="INDICATOR_NOT_CALCULATED"; return false; }
-
+   //--- CopyBuffer first: in the non-visual tester indicators are calculated lazily on request,
+   //--- so BarsCalculated() can lag Bars() until data is requested. Comparing it to Bars()
+   //--- before copying rejected every first tick of a bar (0 trades in non-visual runs).
    double up[],lo[],rsi[],adx[],atr[];
    if(!AG_Copy2(g_hBB,1,up) || !AG_Copy2(g_hBB,2,lo) || !AG_Copy2(g_hRSI,0,rsi)
       || !AG_Copy2(g_hADX,0,adx) || !AG_Copy2(g_hATR,0,atr))
      { s.err="COPYBUFFER_FAILED"; return false; }
+   if(BarsCalculated(g_hBB)<need || BarsCalculated(g_hRSI)<need || BarsCalculated(g_hADX)<need || BarsCalculated(g_hATR)<need)
+     { s.err="INDICATOR_NOT_CALCULATED"; return false; }
 
    MqlRates r[];
    ArraySetAsSeries(r,true);
