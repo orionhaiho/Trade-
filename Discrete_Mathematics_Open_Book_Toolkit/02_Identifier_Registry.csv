@@ -1,0 +1,224 @@
+id,loai,ten,tep,nhan_nguon
+LOG-01,Dạng bài,"Nhận biết mệnh đề, phân loại sơ cấp/phức hợp",02_Problem_Taxonomy.md,
+LOG-02,Dạng bài,Lập bảng chân trị; hằng đúng / hằng sai,02_Problem_Taxonomy.md,
+LOG-03,Dạng bài,Chứng minh tương đương logic / rút gọn dạng mệnh đề,02_Problem_Taxonomy.md,
+LOG-04,Dạng bài,"Chứng minh suy luận đúng (quy tắc suy diễn, phản chứng)",02_Problem_Taxonomy.md,
+LOG-05,Dạng bài,Suy luận sai — tìm phản ví dụ; bài toán lời văn,02_Problem_Taxonomy.md,
+QNT-01,Dạng bài,Xét chân trị mệnh đề có lượng từ,02_Problem_Taxonomy.md,
+QNT-02,Dạng bài,Phủ định mệnh đề có lượng từ,02_Problem_Taxonomy.md,
+SET-01,Dạng bài,"Phép toán tập hợp, chứng minh đẳng thức tập hợp",02_Problem_Taxonomy.md,
+SET-02,Dạng bài,"Tập lũy thừa, tích Đề-các, lực lượng",02_Problem_Taxonomy.md,
+FUN-01,Dạng bài,"Ánh xạ: kiểm tra định nghĩa, ảnh và ảnh ngược",02_Problem_Taxonomy.md,
+FUN-02,Dạng bài,"Đơn ánh, toàn ánh, song ánh; ánh xạ ngược",02_Problem_Taxonomy.md,
+FUN-03,Dạng bài,"Tích (hợp) ánh xạ $g\circ f$, $f\circ g$",02_Problem_Taxonomy.md,
+IND-01,Dạng bài,Chứng minh bằng quy nạp toán học,02_Problem_Taxonomy.md,
+CNT-01,Dạng bài,"Nguyên lý cộng, nhân (đếm số, chia trường hợp)",02_Problem_Taxonomy.md,
+CNT-02,Dạng bài,Nguyên lý chuồng bồ câu (Dirichlet),02_Problem_Taxonomy.md,
+CNT-03,Dạng bài,Nguyên lý bù trừ,02_Problem_Taxonomy.md,
+CNT-04,Dạng bài,"Hoán vị, chỉnh hợp, tổ hợp",02_Problem_Taxonomy.md,
+CNT-05,Dạng bài,Hoán vị lặp (sắp xếp có phần tử giống nhau),02_Problem_Taxonomy.md,
+CNT-06,Dạng bài,Tổ hợp lặp; số nghiệm nguyên không âm có ràng buộc; chia vật giống nhau,02_Problem_Taxonomy.md,
+REC-01,Dạng bài,Lập hệ thức đệ qui từ bài toán,02_Problem_Taxonomy.md,
+REC-02,Dạng bài,"Giải hệ thức đệ qui tuyến tính thuần nhất (cấp 1, 2)",02_Problem_Taxonomy.md,
+REC-03,Dạng bài,"Giải hệ thức không thuần nhất, vế phải $f_n=\beta^nP_r(n)$",02_Problem_Taxonomy.md,
+REC-04,Dạng bài,Vế phải là tổng nhiều dạng (chồng chất nghiệm riêng),02_Problem_Taxonomy.md,
+REL-01,Dạng bài,Liệt kê quan hệ; ma trận biểu diễn,02_Problem_Taxonomy.md,
+REL-02,Dạng bài,"Kiểm tra tính chất phản xạ, đối xứng, phản xứng, bắc cầu",02_Problem_Taxonomy.md,
+REL-03,Dạng bài,"Quan hệ tương đương, lớp tương đương, đồng dư",02_Problem_Taxonomy.md,
+POS-01,Dạng bài,Chứng minh quan hệ thứ tự; thứ tự toàn phần,02_Problem_Taxonomy.md,
+POS-02,Dạng bài,Thứ tự từ điển,02_Problem_Taxonomy.md,
+POS-03,Dạng bài,"Biểu đồ Hasse; tối đại, tối tiểu, lớn nhất, nhỏ nhất",02_Problem_Taxonomy.md,
+POS-04,Dạng bài,"Chặn trên, chặn dưới, sup, inf",02_Problem_Taxonomy.md,
+POS-05,Dạng bài,Sắp xếp topo,02_Problem_Taxonomy.md,
+BOO-01,Dạng bài,Hàm Bool từ mô tả; bảng chân trị; dạng nối rời chính tắc,02_Problem_Taxonomy.md,
+BOO-02,Dạng bài,"Biểu đồ Karnaugh: vẽ kar(f), đọc tế bào ↔ đơn thức",02_Problem_Taxonomy.md,
+BOO-03,Dạng bài,Tìm công thức đa thức tối tiểu bằng Karnaugh,02_Problem_Taxonomy.md,
+BOO-04,Dạng bài,"Mạng logic: vẽ mạch, đọc mạch, thiết kế mạch công tắc",02_Problem_Taxonomy.md,
+GRA-01,Dạng bài,Phân loại đồ thị; bậc; định lý bắt tay,02_Problem_Taxonomy.md,
+GRA-02,Dạng bài,Ma trận kề,02_Problem_Taxonomy.md,
+GRA-03,Dạng bài,Đẳng cấu đồ thị,02_Problem_Taxonomy.md,
+GRA-04,Dạng bài,"Đường đi, chu trình, liên thông, đỉnh khớp, cầu",02_Problem_Taxonomy.md,
+GRA-05,Dạng bài,Đường đi / chu trình Euler; thuật toán Fleury,02_Problem_Taxonomy.md,
+GRA-06,Dạng bài,Đường đi ngắn nhất — Dijkstra,02_Problem_Taxonomy.md,
+GRA-07,Dạng bài,Đường đi ngắn nhất — Ford–Bellman; phát hiện mạch âm,02_Problem_Taxonomy.md,
+F-LOG-01,Công thức/Định lý,Năm phép toán mệnh đề,04_Formula_Handbook.md,
+F-LOG-02,Công thức/Định lý,"Tương đương logic, hệ quả logic, quy tắc thay thế",04_Formula_Handbook.md,
+F-LOG-03,Công thức/Định lý,Các luật logic (11 nhóm),04_Formula_Handbook.md,
+F-LOG-04,Công thức/Định lý,Các quy tắc suy diễn,04_Formula_Handbook.md,
+F-QNT-01,Công thức/Định lý,Lượng từ và hoán vị lượng từ,04_Formula_Handbook.md,
+F-QNT-02,Công thức/Định lý,Phủ định mệnh đề lượng từ,04_Formula_Handbook.md,
+F-SET-01,Công thức/Định lý,Phép toán và luật tập hợp,04_Formula_Handbook.md,
+F-SET-02,Công thức/Định lý,"Tập lũy thừa, tích Đề-các",04_Formula_Handbook.md,
+F-FUN-01,Công thức/Định lý,"Ánh xạ, ảnh, ảnh ngược",04_Formula_Handbook.md,
+F-FUN-02,Công thức/Định lý,"Đơn ánh, toàn ánh, song ánh",04_Formula_Handbook.md,
+F-FUN-03,Công thức/Định lý,"Ánh xạ ngược, tích ánh xạ",04_Formula_Handbook.md,
+F-IND-01,Công thức/Định lý,Nguyên lý quy nạp toán học,04_Formula_Handbook.md,
+F-CNT-01,Công thức/Định lý,"Nguyên lý cộng, nguyên lý nhân",04_Formula_Handbook.md,
+F-CNT-02,Công thức/Định lý,Nguyên lý chuồng bồ câu (Dirichlet),04_Formula_Handbook.md,
+F-CNT-03,Công thức/Định lý,Nguyên lý bù trừ,04_Formula_Handbook.md,
+F-CNT-04,Công thức/Định lý,"Hoán vị, chỉnh hợp, tổ hợp",04_Formula_Handbook.md,
+F-CNT-05,Công thức/Định lý,Hoán vị lặp,04_Formula_Handbook.md,
+F-CNT-06,Công thức/Định lý,Tổ hợp lặp; nghiệm nguyên không âm,04_Formula_Handbook.md,
+F-REC-01,Công thức/Định lý,Hệ thức đệ qui tuyến tính cấp $k$; cấp 1,04_Formula_Handbook.md,
+F-REC-02,Công thức/Định lý,Thuần nhất cấp 2,04_Formula_Handbook.md,
+F-REC-03,Công thức/Định lý,Nghiệm riêng khi $f_n=\beta^nP_r(n)$ (Dạng 1),04_Formula_Handbook.md,
+F-REC-04,Công thức/Định lý,Chồng chất nghiệm riêng (Dạng 2),04_Formula_Handbook.md,
+F-REC-05,Công thức/Định lý,Cấu trúc nghiệm hệ không thuần nhất,04_Formula_Handbook.md,
+F-REL-01,Công thức/Định lý,"Quan hệ, ma trận biểu diễn, bốn tính chất",04_Formula_Handbook.md,
+F-REL-02,Công thức/Định lý,"Quan hệ tương đương, lớp tương đương, phân hoạch",04_Formula_Handbook.md,
+F-REL-03,Công thức/Định lý,Đồng dư modulo $m$,04_Formula_Handbook.md,
+F-POS-01,Công thức/Định lý,"Quan hệ thứ tự (poset), thứ tự toàn phần",04_Formula_Handbook.md,
+F-POS-02,Công thức/Định lý,Thứ tự từ điển,04_Formula_Handbook.md,
+F-POS-03,Công thức/Định lý,"Hasse, phần tử đặc biệt, chặn, sup/inf, topo",04_Formula_Handbook.md,
+F-BOO-01,Công thức/Định lý,Tiên đề đại số Bool,04_Formula_Handbook.md,
+F-BOO-02,Công thức/Định lý,"Hàm Bool, phép toán, dạng nối rời chính tắc",04_Formula_Handbook.md,
+F-BOO-03,Công thức/Định lý,Biểu đồ Karnaugh (khung nhãn của nguồn),04_Formula_Handbook.md,
+F-BOO-04,Công thức/Định lý,"Tế bào, tế bào lớn, công thức đa thức tối tiểu",04_Formula_Handbook.md,
+F-BOO-05,Công thức/Định lý,Cổng logic,04_Formula_Handbook.md,
+F-GRA-01,Công thức/Định lý,"Bậc, định lý bắt tay",04_Formula_Handbook.md,
+F-GRA-02,Công thức/Định lý,Ma trận kề,04_Formula_Handbook.md,
+F-GRA-03,Công thức/Định lý,Đẳng cấu và bất biến,04_Formula_Handbook.md,
+F-GRA-04,Công thức/Định lý,Điều kiện Euler,04_Formula_Handbook.md,
+F-GRA-05,Công thức/Định lý,Dijkstra,04_Formula_Handbook.md,
+F-GRA-06,Công thức/Định lý,Ford–Bellman,04_Formula_Handbook.md,
+M-01,Phương pháp,Lập bảng chân trị,05_Method_Library.md,
+M-02,Phương pháp,Biến đổi tương đương bằng luật logic,05_Method_Library.md,
+M-03,Phương pháp,Chuỗi quy tắc suy diễn (chứng minh trực tiếp),05_Method_Library.md,
+M-04,Phương pháp,Phản chứng (quy tắc mâu thuẫn),05_Method_Library.md,
+M-05,Phương pháp,Kiểm tra suy luận bằng hệ chân trị / phản ví dụ,05_Method_Library.md,
+M-06,Phương pháp,Xét chân trị mệnh đề lượng từ,05_Method_Library.md,
+M-07,Phương pháp,Phủ định mệnh đề lượng từ,05_Method_Library.md,
+M-08,Phương pháp,Chứng minh đẳng thức tập hợp,05_Method_Library.md,
+M-09,Phương pháp,Xét đơn/toàn/song ánh qua phương trình $f(x)=y$,05_Method_Library.md,
+M-10,Phương pháp,Quy nạp toán học,05_Method_Library.md,
+M-11,Phương pháp,Đếm bằng chia trường hợp + nguyên lý nhân,05_Method_Library.md,
+M-12,Phương pháp,Nguyên lý chuồng bồ câu,05_Method_Library.md,
+M-13,Phương pháp,Bù trừ / đếm phần bù,05_Method_Library.md,
+M-14,Phương pháp,Chọn đúng công thức tổ hợp (cây quyết định),05_Method_Library.md,
+M-15,Phương pháp,Đổi biến cho nghiệm nguyên có ràng buộc,05_Method_Library.md,
+M-16,Phương pháp,Lập hệ thức đệ qui,05_Method_Library.md,
+M-17,Phương pháp,Giải hệ thức đệ qui tuyến tính (quy trình đầy đủ),05_Method_Library.md,
+M-18,Phương pháp,Kiểm tra tính chất quan hệ,05_Method_Library.md,
+M-19,Phương pháp,Tìm lớp tương đương,05_Method_Library.md,
+M-20,Phương pháp,"Vẽ Hasse và đọc phần tử đặc biệt, chặn",05_Method_Library.md,
+M-21,Phương pháp,Sắp xếp topo,05_Method_Library.md,
+M-22,Phương pháp,Thuật toán Karnaugh 5 bước,05_Method_Library.md,
+M-23,Phương pháp,Từ bảng chân trị / mô tả đến công thức và mạch,05_Method_Library.md,
+M-24,Phương pháp,Kiểm tra đẳng cấu,05_Method_Library.md,
+M-25,Phương pháp,Euler: kiểm tra điều kiện + Fleury,05_Method_Library.md,
+M-26,Phương pháp,Dijkstra dạng bảng,05_Method_Library.md,
+M-27,Phương pháp,Ford–Bellman dạng bảng,05_Method_Library.md,
+LOG-01-E01,Ví dụ,Nhận biết mệnh đề; sơ cấp hay phức hợp,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+LOG-02-E01,Ví dụ,Lập bảng chân trị,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+LOG-02-E02,Ví dụ,"Hằng đúng, hằng sai — bẫy",06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+LOG-03-E01,Ví dụ,Chứng minh tương đương bằng luật logic,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+LOG-03-E02,Ví dụ,Rút gọn dạng mệnh đề; hệ quả logic,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,AI-GENERATED PRACTICE
+LOG-04-E01,Ví dụ,Chứng minh suy luận bằng chuỗi quy tắc,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+LOG-04-E02,Ví dụ,Chứng minh suy luận bằng phản chứng,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+LOG-04-E03,Ví dụ,Phản chứng hoặc tam đoạn luận nối tiếp,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+LOG-05-E01,Ví dụ,Suy luận lời văn — tìm phản ví dụ,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+LOG-05-E02,Ví dụ,Suy luận sai — và kết luận đúng là gì,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+QNT-01-E01,Ví dụ,Chân trị mệnh đề lượng từ một và hai biến,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+QNT-01-E02,Ví dụ,Thứ tự lượng từ và miền xác định — bẫy,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,AI-GENERATED PRACTICE
+QNT-02-E01,Ví dụ,Phủ định mệnh đề lượng từ,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+SET-01-E01,Ví dụ,Chứng minh đẳng thức tập hợp,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,AI-GENERATED PRACTICE
+SET-02-E01,Ví dụ,"Tập các tập con, tích Đề-các",06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+FUN-01-E01,Ví dụ,Ảnh và ảnh ngược,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+FUN-02-E01,Ví dụ,"Đơn, toàn, song ánh; ánh xạ ngược",06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+FUN-02-E02,Ví dụ,Hàm phân thức: đơn ánh nhưng không toàn ánh — bẫy tập đích,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,AI-GENERATED PRACTICE
+FUN-03-E01,Ví dụ,"Tích ánh xạ, kể cả hàm từng khúc",06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+IND-01-E01,Ví dụ,Quy nạp: tổng số lẻ,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+IND-01-E02,Ví dụ,Quy nạp: tổng $1+2+\dots+n$,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+IND-01-E03,Ví dụ,"Quy nạp bất đẳng thức, bước cơ sở $n_0=4$",06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+IND-01-E04,Ví dụ,Chia hết: quy nạp và chứng minh theo trường hợp,06_Example_Bank/06_1_Logic_Sets_Functions_Induction.md,SOURCE
+CNT-01-E01,Ví dụ,Đếm số chẵn có 3 chữ số khác nhau (chia trường hợp chữ số 0),06_Example_Bank/06_2_Counting.md,SOURCE
+CNT-01-E02,Ví dụ,Số 4 chữ số khác nhau chia hết cho 5,06_Example_Bank/06_2_Counting.md,AI-GENERATED PRACTICE
+CNT-02-E01,Ví dụ,Nguyên lý chuồng bồ câu,06_Example_Bank/06_2_Counting.md,SOURCE
+CNT-03-E01,Ví dụ,Bù trừ hai tập,06_Example_Bank/06_2_Counting.md,SOURCE
+CNT-03-E02,Ví dụ,"Bù trừ ba tập: chia hết cho 2, 3 hoặc 5",06_Example_Bank/06_2_Counting.md,AI-GENERATED PRACTICE
+CNT-04-E01,Ví dụ,"Hoán vị, chỉnh hợp hay tổ hợp?",06_Example_Bank/06_2_Counting.md,SOURCE
+CNT-05-E01,Ví dụ,Hoán vị lặp — sắp xếp chữ cái,06_Example_Bank/06_2_Counting.md,SOURCE
+CNT-06-E01,Ví dụ,Tổ hợp lặp cơ bản,06_Example_Bank/06_2_Counting.md,SOURCE
+CNT-06-E02,Ví dụ,Nghiệm nguyên không âm với ràng buộc trên và dưới,06_Example_Bank/06_2_Counting.md,SOURCE
+CNT-06-E03,Ví dụ,Chia vật giống nhau có cận trên và cận dưới,06_Example_Bank/06_2_Counting.md,SOURCE
+REC-01-E01,Ví dụ,Lập hệ thức: cầu thang bước 1 hoặc 2 bậc,06_Example_Bank/06_3_Recurrences.md,SOURCE
+REC-01-E02,Ví dụ,Lập hệ thức: tháp Hà Nội,06_Example_Bank/06_3_Recurrences.md,SOURCE
+REC-01-E03,Ví dụ,Lập hệ thức: chuỗi bit không có hai số 0 liên tiếp,06_Example_Bank/06_3_Recurrences.md,AI-GENERATED PRACTICE
+REC-02-E01,Ví dụ,Thuần nhất cấp 1,06_Example_Bank/06_3_Recurrences.md,SOURCE
+REC-02-E02,Ví dụ,Thuần nhất cấp 2: nghiệm phân biệt và nghiệm kép,06_Example_Bank/06_3_Recurrences.md,SOURCE
+REC-02-E03,Ví dụ,Giải hệ thức cầu thang (nghiệm vô tỉ),06_Example_Bank/06_3_Recurrences.md,AI-GENERATED PRACTICE
+REC-03-E01,Ví dụ,"Vế phải đa thức, $\beta=1$ là nghiệm đơn",06_Example_Bank/06_3_Recurrences.md,SOURCE
+REC-03-E02,Ví dụ,"$\beta$ là nghiệm kép, có điều kiện đầu",06_Example_Bank/06_3_Recurrences.md,SOURCE
+REC-03-E03,Ví dụ,"$\beta$ không là nghiệm, đa thức bậc 2",06_Example_Bank/06_3_Recurrences.md,SOURCE
+REC-03-E04,Ví dụ,Bài tập S2-p67 (1): $\beta=1$ nghiệm đơn,06_Example_Bank/06_3_Recurrences.md,SOURCE
+REC-03-E05,Ví dụ,"Bài tập S2-p67 (2): nghiệm âm, $\beta=3$ không là nghiệm",06_Example_Bank/06_3_Recurrences.md,SOURCE
+REC-03-E06,Ví dụ,"Bài tập S2-p67 (3): vế phải hằng, $\beta=1$ nghiệm kép",06_Example_Bank/06_3_Recurrences.md,SOURCE
+REC-03-E07,Ví dụ,"Bài tập S2-p67 (4): đa thức bậc 2, $\beta=1$ không là nghiệm",06_Example_Bank/06_3_Recurrences.md,SOURCE
+REC-03-E08,Ví dụ,Bài tập S2-p67 (5): viết lại vế phải $2\cdot5^{n+1}$,06_Example_Bank/06_3_Recurrences.md,SOURCE
+REC-03-E09,Ví dụ,Bài tập S2-p67 (6): $\beta=8$ nghiệm kép,06_Example_Bank/06_3_Recurrences.md,SOURCE
+REC-04-E01,Ví dụ,Vế phải tổng ba dạng (chồng chất),06_Example_Bank/06_3_Recurrences.md,SOURCE
+REL-01-E01,Ví dụ,Quan hệ ↔ ma trận biểu diễn,06_Example_Bank/06_4_Relations_Posets.md,SOURCE
+REL-02-E01,Ví dụ,Bảng bốn tính chất của quan hệ hữu hạn,06_Example_Bank/06_4_Relations_Posets.md,SOURCE
+REL-02-E02,Ví dụ,Quan hệ trên $\mathbb Z$: $aRb\Leftrightarrow ab\ge0$ — bẫy bắc cầu,06_Example_Bank/06_4_Relations_Posets.md,AI-GENERATED PRACTICE
+REL-03-E01,Ví dụ,Đồng dư modulo $m$ và lớp tương đương,06_Example_Bank/06_4_Relations_Posets.md,SOURCE
+REL-03-E02,Ví dụ,Từ phân hoạch sang quan hệ tương đương,06_Example_Bank/06_4_Relations_Posets.md,AI-GENERATED PRACTICE
+POS-01-E01,Ví dụ,Có phải poset? Thứ tự toàn phần?,06_Example_Bank/06_4_Relations_Posets.md,SOURCE
+POS-02-E01,Ví dụ,Thứ tự từ điển,06_Example_Bank/06_4_Relations_Posets.md,SOURCE
+POS-03-E01,Ví dụ,"Hasse, tối đại, tối tiểu, lớn nhất, nhỏ nhất",06_Example_Bank/06_4_Relations_Posets.md,SOURCE
+POS-04-E01,Ví dụ,"Chặn trên, chặn dưới, sup, inf",06_Example_Bank/06_4_Relations_Posets.md,AI-GENERATED PRACTICE
+POS-05-E01,Ví dụ,Sắp xếp topo,06_Example_Bank/06_4_Relations_Posets.md,AI-GENERATED PRACTICE
+BOO-01-E01,Ví dụ,Hàm bỏ phiếu đa số: bảng chân trị → dạng nối rời chính tắc → tối tiểu,06_Example_Bank/06_5_Boolean.md,SOURCE
+BOO-01-E02,Ví dụ,Dạng nối rời chính tắc từ công thức,06_Example_Bank/06_5_Boolean.md,AI-GENERATED PRACTICE
+BOO-02-E01,Ví dụ,Tế bào ↔ đơn thức,06_Example_Bank/06_5_Boolean.md,SOURCE
+BOO-03-E01,Ví dụ,Karnaugh: một phủ tối tiểu duy nhất,06_Example_Bank/06_5_Boolean.md,SOURCE
+BOO-03-E02,Ví dụ,Karnaugh: hai công thức tối tiểu,06_Example_Bank/06_5_Boolean.md,SOURCE
+BOO-03-E03,Ví dụ,Karnaugh: hai phủ nhưng chỉ một tối tiểu — bẫy,06_Example_Bank/06_5_Boolean.md,SOURCE
+BOO-03-E04,Ví dụ,Karnaugh 3 biến,06_Example_Bank/06_5_Boolean.md,AI-GENERATED PRACTICE
+BOO-03-E05,Ví dụ,Karnaugh 4 biến có tế bào bốn góc và hai lựa chọn,06_Example_Bank/06_5_Boolean.md,AI-GENERATED PRACTICE
+BOO-04-E01,Ví dụ,Thiết kế mạch 2 công tắc,06_Example_Bank/06_5_Boolean.md,SOURCE
+BOO-04-E02,Ví dụ,Thiết kế mạch 3 công tắc (đèn cầu thang),06_Example_Bank/06_5_Boolean.md,SOURCE
+BOO-04-E03,Ví dụ,Đọc mạch: kết quả là hằng 0 — bẫy,06_Example_Bank/06_5_Boolean.md,SOURCE
+BOO-04-E04,Ví dụ,Vẽ mạch từ công thức — và rút gọn trước khi vẽ,06_Example_Bank/06_5_Boolean.md,SOURCE
+GRA-01-E01,Ví dụ,Bậc đỉnh: vô hướng có khuyên; có hướng,06_Example_Bank/06_6_Graphs.md,SOURCE
+GRA-01-E02,Ví dụ,Định lý bắt tay: tồn tại đồ thị? số cạnh? — bẫy,06_Example_Bank/06_6_Graphs.md,AI-GENERATED PRACTICE
+GRA-02-E01,Ví dụ,Ma trận kề,06_Example_Bank/06_6_Graphs.md,SOURCE
+GRA-03-E01,Ví dụ,"Đẳng cấu: bác bỏ bằng bất biến, khẳng định bằng song ánh",06_Example_Bank/06_6_Graphs.md,AI-GENERATED PRACTICE
+GRA-04-E01,Ví dụ,"Đường đi đơn/sơ cấp, chu trình sơ cấp, đỉnh khớp, cầu",06_Example_Bank/06_6_Graphs.md,SOURCE
+GRA-05-E01,Ví dụ,Chu trình Euler bằng Fleury,06_Example_Bank/06_6_Graphs.md,SOURCE
+GRA-05-E02,Ví dụ,Bài toán 7 cây cầu Königsberg,06_Example_Bank/06_6_Graphs.md,SOURCE
+GRA-06-E01,Ví dụ,Dijkstra trên đồ thị vô hướng,06_Example_Bank/06_6_Graphs.md,SOURCE
+GRA-06-E02,Ví dụ,Dijkstra trên đồ thị có hướng cho bằng ma trận trọng số,06_Example_Bank/06_6_Graphs.md,SOURCE
+GRA-06-E03,Ví dụ,Dijkstra: đường đi ngắn nhất từ $a$ đến $z$,06_Example_Bank/06_6_Graphs.md,SOURCE
+GRA-07-E01,Ví dụ,Ford–Bellman phát hiện mạch âm,06_Example_Bank/06_6_Graphs.md,SOURCE
+GRA-07-E02,Ví dụ,Ford–Bellman hội tụ,06_Example_Bank/06_6_Graphs.md,SOURCE
+T-01,Bẫy/Lỗi,Kéo theo có tiền đề sai; câu chứa biến,07_Common_Traps.md,
+T-02,Bẫy/Lỗi,De Morgan và phân phối sai chiều,07_Common_Traps.md,
+T-03,Bẫy/Lỗi,"Đảo, phản đảo, phủ định của kéo theo",07_Common_Traps.md,
+T-04,Bẫy/Lỗi,Khẳng định hệ quả / phủ định tiền đề,07_Common_Traps.md,
+T-05,Bẫy/Lỗi,"""Có dấu phủ định nên là hằng sai""",07_Common_Traps.md,
+T-06,Bẫy/Lỗi,Đổi thứ tự lượng từ; bỏ qua miền,07_Common_Traps.md,
+T-07,Bẫy/Lỗi,Phủ định lượng từ: phủ định cả miền,07_Common_Traps.md,
+T-08,Bẫy/Lỗi,"Ánh xạ: bỏ qua miền, tập đích, điểm cực trị",07_Common_Traps.md,
+T-09,Bẫy/Lỗi,"Quy nạp: sai bước cơ sở, sai số hạng thứ $k+1$, không dùng giả thiết",07_Common_Traps.md,
+T-10,Bẫy/Lỗi,Chữ số đầu bằng 0; không tách trường hợp chữ số 0,07_Common_Traps.md,
+T-11,Bẫy/Lỗi,Nhầm có thứ tự / không thứ tự; có lặp / không lặp,07_Common_Traps.md,
+T-12,Bẫy/Lỗi,"Tổ hợp lặp: đảo $n,k$; ""$>$"" thành ""$\ge$"" sai",07_Common_Traps.md,
+T-13,Bẫy/Lỗi,Vế phải là đa thức thì $\beta=1$; viết lại lũy thừa,07_Common_Traps.md,
+T-14,Bẫy/Lỗi,"Tìm hằng số $C_1,C_2$ trước khi cộng nghiệm riêng",07_Common_Traps.md,
+T-15,Bẫy/Lỗi,Bội của $\beta$ và dạng nghiệm kép,07_Common_Traps.md,
+T-16,Bẫy/Lỗi,"Tính chất quan hệ: chứng minh bằng ví dụ, bỏ sót cặp",07_Common_Traps.md,
+T-17,Bẫy/Lỗi,"Phản xứng ≠ ""không đối xứng""; $(\mathbb Z,\mid)$ không là poset",07_Common_Traps.md,
+T-18,Bẫy/Lỗi,Hasse: vẽ cung bắc cầu; tối đại ≠ lớn nhất,07_Common_Traps.md,
+T-19,Bẫy/Lỗi,Chặn trên/dưới và sup/inf,07_Common_Traps.md,
+T-20,Bẫy/Lỗi,Karnaugh: quên quấn biên và 4 góc,07_Common_Traps.md,
+T-21,Bẫy/Lỗi,"Karnaugh: tế bào chưa ""lớn""; không so sánh độ đơn giản",07_Common_Traps.md,
+T-22,Bẫy/Lỗi,Bù của tích ≠ tích các bù; mạch hằng,07_Common_Traps.md,
+T-23,Bẫy/Lỗi,"Bậc và ma trận kề: khuyên, cạnh song song",07_Common_Traps.md,
+T-24,Bẫy/Lỗi,Đẳng cấu: bất biến chỉ là điều kiện cần,07_Common_Traps.md,
+T-25,Bẫy/Lỗi,"Euler: quên liên thông, đếm sai đỉnh lẻ, đi qua cầu sớm",07_Common_Traps.md,
+T-26,Bẫy/Lỗi,Dùng Dijkstra khi có trọng số âm,07_Common_Traps.md,
+T-27,Bẫy/Lỗi,Dijkstra: cập nhật đỉnh đã cố định; chọn min sai phạm vi; dừng sớm,07_Common_Traps.md,
+T-28,Bẫy/Lỗi,Ford–Bellman: dùng giá trị cùng dòng; điều kiện dừng,07_Common_Traps.md,
+T-29,Bẫy/Lỗi,Thứ tự từ điển: so độ dài trước,07_Common_Traps.md,
+T-30,Bẫy/Lỗi,Ma trận kề/trọng số: đọc sai hướng; không nêu quy ước khuyên,07_Common_Traps.md,
+T-31,Bẫy/Lỗi,Áp dụng công thức ngoài phạm vi slide,07_Common_Traps.md,

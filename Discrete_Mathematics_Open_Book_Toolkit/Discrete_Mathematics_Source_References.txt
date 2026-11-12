@@ -1,0 +1,38 @@
+DISCRETE MATHEMATICS OPEN-BOOK TOOLKIT — SOURCE REFERENCES
+==========================================================
+
+Quy ước trích dẫn trong toàn bộ toolkit:  S<k>-p<n>  =  trang PDF thứ n của tệp nguồn S<k>.
+
+S0  Claude_Discrete_Mathematics_Open_Book_Toolkit_Prompt.md
+    Vai trò: Project Specification (kiến trúc, quy chuẩn, tiêu chí nghiệm thu). KHÔNG phải nguồn kiến thức.
+
+S1  01.pdf — "CẤU TRÚC RỜI RẠC", Phạm Thế Bảo (SGU), Chương I: Cơ sở logic. 100 trang.
+    p5 mục lục chương; p6–17 mệnh đề & 5 phép toán; p18–30 dạng mệnh đề, tương đương, luật logic;
+    p31–56 quy tắc suy diễn (p52–56 chỉ có ảnh); p58–72 vị từ, lượng từ; p73–82 tập hợp;
+    p83–96 ánh xạ; p97–100 quy nạp.
+
+S2  02.pdf — Chương II: Phép đếm. 67 trang.
+    p3–10 nguyên lý cộng/nhân/Dirichlet/bù trừ; p11–16 hoán vị, chỉnh hợp, tổ hợp;
+    p17–25 hoán vị lặp, tổ hợp lặp, nghiệm nguyên; p26–40 lập hệ thức đệ qui (cầu thang, tháp Hà Nội);
+    p41–46 thuần nhất; p47–66 không thuần nhất (p57–59 chỉ có ảnh); p67 bài tập (6 hệ thức).
+
+S3  03.pdf — Chương 3: Quan hệ. 56 trang.
+    p4–11 định nghĩa, 4 tính chất; p12–18 ma trận biểu diễn; p19–27 quan hệ tương đương, đồng dư;
+    p28–41 quan hệ thứ tự, thứ tự từ điển; p42–49 Hasse, tối đại/tối tiểu; p50–53 chặn, sup/inf; p54–56 topo.
+
+S4  04.pdf — Chương IV: Đại số Bool. 79 trang.
+    p5–9 đại số Bool; p10–19 hàm Bool, dạng nối rời chính tắc; p20–37 Karnaugh, tế bào;
+    p38–40 thuật toán; p41–65 ba ví dụ tối tiểu hóa (đọc từ ảnh); p66–78 mạng logic; p79 link Quine–McCluskey.
+
+S5  05.pdf — Chương 5: Đồ thị. 86 trang.
+    p3–25 khái niệm, bậc; p26–28 ma trận kề; p29–35 đẳng cấu; p36–42 đường đi, liên thông, khớp, cầu;
+    p43–51 Euler, Fleury; p52–72 đường đi ngắn nhất, Dijkstra; p73–86 Ford–Bellman.
+
+Tài liệu tham khảo được slide nêu (S1-p3) nhưng KHÔNG được cung cấp, KHÔNG được dùng:
+  [R1] Nguyễn Duy Nhất, Nguyễn Văn Phong, Đinh Ngọc Thanh — Toán rời rạc.
+  [R2] Trần Ngọc Hội — Toán rời rạc.
+  [R3] Nguyễn Hữu Anh — Toán rời rạc, NXB Giáo dục.
+  [R4] K. Rosen — Discrete Mathematics and Its Applications, 6th ed., 2007.
+
+Nội dung ngoài nguồn: các ví dụ gắn nhãn [AI-GENERATED PRACTICE] và các mục gắn [INFERRED];
+mọi đáp số đã kiểm tra bằng 10_Verification/*.py.

@@ -1,0 +1,41 @@
+id,ten,tep
+F-LOG-01,Năm phép toán mệnh đề,04_Formula_Handbook.md
+F-LOG-02,"Tương đương logic, hệ quả logic, quy tắc thay thế",04_Formula_Handbook.md
+F-LOG-03,Các luật logic (11 nhóm),04_Formula_Handbook.md
+F-LOG-04,Các quy tắc suy diễn,04_Formula_Handbook.md
+F-QNT-01,Lượng từ và hoán vị lượng từ,04_Formula_Handbook.md
+F-QNT-02,Phủ định mệnh đề lượng từ,04_Formula_Handbook.md
+F-SET-01,Phép toán và luật tập hợp,04_Formula_Handbook.md
+F-SET-02,"Tập lũy thừa, tích Đề-các",04_Formula_Handbook.md
+F-FUN-01,"Ánh xạ, ảnh, ảnh ngược",04_Formula_Handbook.md
+F-FUN-02,"Đơn ánh, toàn ánh, song ánh",04_Formula_Handbook.md
+F-FUN-03,"Ánh xạ ngược, tích ánh xạ",04_Formula_Handbook.md
+F-IND-01,Nguyên lý quy nạp toán học,04_Formula_Handbook.md
+F-CNT-01,"Nguyên lý cộng, nguyên lý nhân",04_Formula_Handbook.md
+F-CNT-02,Nguyên lý chuồng bồ câu (Dirichlet),04_Formula_Handbook.md
+F-CNT-03,Nguyên lý bù trừ,04_Formula_Handbook.md
+F-CNT-04,"Hoán vị, chỉnh hợp, tổ hợp",04_Formula_Handbook.md
+F-CNT-05,Hoán vị lặp,04_Formula_Handbook.md
+F-CNT-06,Tổ hợp lặp; nghiệm nguyên không âm,04_Formula_Handbook.md
+F-REC-01,Hệ thức đệ qui tuyến tính cấp $k$; cấp 1,04_Formula_Handbook.md
+F-REC-02,Thuần nhất cấp 2,04_Formula_Handbook.md
+F-REC-03,Nghiệm riêng khi $f_n=\beta^nP_r(n)$ (Dạng 1),04_Formula_Handbook.md
+F-REC-04,Chồng chất nghiệm riêng (Dạng 2),04_Formula_Handbook.md
+F-REC-05,Cấu trúc nghiệm hệ không thuần nhất,04_Formula_Handbook.md
+F-REL-01,"Quan hệ, ma trận biểu diễn, bốn tính chất",04_Formula_Handbook.md
+F-REL-02,"Quan hệ tương đương, lớp tương đương, phân hoạch",04_Formula_Handbook.md
+F-REL-03,Đồng dư modulo $m$,04_Formula_Handbook.md
+F-POS-01,"Quan hệ thứ tự (poset), thứ tự toàn phần",04_Formula_Handbook.md
+F-POS-02,Thứ tự từ điển,04_Formula_Handbook.md
+F-POS-03,"Hasse, phần tử đặc biệt, chặn, sup/inf, topo",04_Formula_Handbook.md
+F-BOO-01,Tiên đề đại số Bool,04_Formula_Handbook.md
+F-BOO-02,"Hàm Bool, phép toán, dạng nối rời chính tắc",04_Formula_Handbook.md
+F-BOO-03,Biểu đồ Karnaugh (khung nhãn của nguồn),04_Formula_Handbook.md
+F-BOO-04,"Tế bào, tế bào lớn, công thức đa thức tối tiểu",04_Formula_Handbook.md
+F-BOO-05,Cổng logic,04_Formula_Handbook.md
+F-GRA-01,"Bậc, định lý bắt tay",04_Formula_Handbook.md
+F-GRA-02,Ma trận kề,04_Formula_Handbook.md
+F-GRA-03,Đẳng cấu và bất biến,04_Formula_Handbook.md
+F-GRA-04,Điều kiện Euler,04_Formula_Handbook.md
+F-GRA-05,Dijkstra,04_Formula_Handbook.md
+F-GRA-06,Ford–Bellman,04_Formula_Handbook.md

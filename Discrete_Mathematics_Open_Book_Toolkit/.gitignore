@@ -1,0 +1,6 @@
+09_Publication/*.aux
+09_Publication/*.log
+09_Publication/*.out
+09_Publication/*.toc
+09_Publication/_combined.md
+__pycache__/

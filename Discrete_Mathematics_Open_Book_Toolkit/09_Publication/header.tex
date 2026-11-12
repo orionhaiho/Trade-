@@ -1,0 +1,69 @@
+% ---- Discrete Mathematics Open-Book Toolkit: preamble bổ sung cho pandoc (XeLaTeX) ----
+\usepackage{fontspec}
+\setmainfont{Noto Serif}
+\setsansfont{Noto Sans}
+\setmonofont{DejaVu Sans Mono}[Scale=0.88]
+\usepackage{amssymb}
+\usepackage{newunicodechar}
+% Ký tự Unicode trong văn bản thường -> ký hiệu toán (font chính có thể thiếu glyph)
+\newunicodechar{→}{\ensuremath{\rightarrow}}
+\newunicodechar{←}{\ensuremath{\leftarrow}}
+\newunicodechar{⇒}{\ensuremath{\Rightarrow}}
+\newunicodechar{⇔}{\ensuremath{\Leftrightarrow}}
+\newunicodechar{↔}{\ensuremath{\leftrightarrow}}
+\newunicodechar{✓}{\ensuremath{\checkmark}}
+\newunicodechar{≤}{\ensuremath{\le}}
+\newunicodechar{≥}{\ensuremath{\ge}}
+\newunicodechar{≠}{\ensuremath{\ne}}
+\newunicodechar{∞}{\ensuremath{\infty}}
+\newunicodechar{×}{\ensuremath{\times}}
+\newunicodechar{∴}{\ensuremath{\therefore}}
+\newunicodechar{∀}{\ensuremath{\forall}}
+\newunicodechar{∃}{\ensuremath{\exists}}
+\newunicodechar{∈}{\ensuremath{\in}}
+\newunicodechar{∧}{\ensuremath{\wedge}}
+\newunicodechar{∨}{\ensuremath{\vee}}
+\newunicodechar{¬}{\ensuremath{\neg}}
+\newunicodechar{↦}{\ensuremath{\mapsto}}
+\newunicodechar{−}{\ensuremath{-}}
+\newunicodechar{∗}{\ensuremath{*}}
+\newunicodechar{∩}{\ensuremath{\cap}}
+\newunicodechar{≼}{\ensuremath{\preceq}}
+\newunicodechar{∪}{\ensuremath{\cup}}
+\newunicodechar{⊆}{\ensuremath{\subseteq}}
+\newunicodechar{①}{\textcircled{\footnotesize 1}}
+\newunicodechar{②}{\textcircled{\footnotesize 2}}
+\newunicodechar{③}{\textcircled{\footnotesize 3}}
+\newunicodechar{④}{\textcircled{\footnotesize 4}}
+\newunicodechar{⑤}{\textcircled{\footnotesize 5}}
+\newunicodechar{⑥}{\textcircled{\footnotesize 6}}
+\newunicodechar{⑦}{\textcircled{\footnotesize 7}}
+\newunicodechar{⑧}{\textcircled{\footnotesize 8}}
+\newunicodechar{⑨}{\textcircled{\footnotesize 9}}
+% Bố cục tiêu đề: mã ví dụ/dạng bài nổi bật, có kẻ ngang
+\usepackage{xcolor}
+\definecolor{idblue}{HTML}{1F4E79}
+\usepackage{titlesec}
+\titleformat{\chapter}[hang]{\normalfont\sffamily\huge\bfseries\color{idblue}}{}{0pt}{}[\vspace{2pt}\titlerule]
+\titlespacing*{\chapter}{0pt}{0pt}{12pt}
+\titleformat{\section}{\normalfont\sffamily\Large\bfseries\color{idblue}}{}{0pt}{}
+\titleformat{\subsection}{\normalfont\sffamily\large\bfseries}{}{0pt}{}[\vspace{1pt}\titlerule]
+\titlespacing*{\subsection}{0pt}{10pt plus 4pt}{4pt}
+% Header/footer
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\sffamily\small\thepage}
+\fancyhead[RE,LO]{\sffamily\small\nouppercase{\leftmark}}
+\fancyfoot[C]{\sffamily\scriptsize Discrete Mathematics Open-Book Toolkit — Cấu trúc rời rạc}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\fancypagestyle{plain}{\fancyhf{}\fancyhead[LE,RO]{\sffamily\small\thepage}\fancyfoot[C]{\sffamily\scriptsize Discrete Mathematics Open-Book Toolkit — Cấu trúc rời rạc}}
+% Bảng: chữ nhỏ hơn một chút, không cắt
+\usepackage{etoolbox}
+\AtBeginEnvironment{longtable}{\small}
+\setlength{\LTpre}{4pt}\setlength{\LTpost}{4pt}
+% Tránh ngắt trang ngay sau tiêu đề ví dụ; cho phép công thức dài ngắt dòng
+\allowdisplaybreaks
+\setlength{\emergencystretch}{3em}
+\raggedbottom
+\widowpenalty=10000 \clubpenalty=10000
