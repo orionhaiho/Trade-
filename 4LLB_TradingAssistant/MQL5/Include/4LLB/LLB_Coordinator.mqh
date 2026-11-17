@@ -133,6 +133,7 @@ private:
    bool                 m_wasConnected;
    long                 m_connectedSinceMs;
    long                 m_disconnectedSinceMs;
+   bool                 m_lossNotified;
    bool                 m_reconcileFlag;
    long                 m_lastReconcileMs;
    long                 m_lastDashMs;
@@ -1008,6 +1009,7 @@ public:
       m_wasConnected=false;
       m_connectedSinceMs=0;
       m_disconnectedSinceMs=0;
+      m_lossNotified=false;
       m_reconcileFlag=false;
       m_lastReconcileMs=0;
       m_lastDashMs=0;
@@ -1189,24 +1191,31 @@ public:
          return;
       datetime now=TimeTradeServer();
       long nowMs=NowMs();
-      //--- broker connection tracking (R-POS-06)
+      //--- broker connection tracking (R-POS-06). Short blips (< 30 s) are only logged, not notified.
       bool conn=IsConnected();
       if(conn && !m_wasConnected)
         {
          m_connectedSinceMs=nowMs;
-         if(m_disconnectedSinceMs>0 && m_recoveryDone)
+         if(m_disconnectedSinceMs>0)
            {
-            Notify(LLB_IconInfo()+" Broker connection restored after "+IntegerToString((nowMs-m_disconnectedSinceMs)/1000)+" s - reconciling orders and positions.");
+            long downSec=(nowMs-m_disconnectedSinceMs)/1000;
+            g_llbLog.Info("CRD","broker connection restored after "+IntegerToString(downSec)+" s");
+            if(m_lossNotified)
+               Notify(LLB_IconInfo()+" Broker connection restored after "+IntegerToString(downSec)+" s - reconciling orders and positions.");
             m_reconcileFlag=true;
            }
          m_disconnectedSinceMs=0;
+         m_lossNotified=false;
         }
       if(!conn && m_wasConnected)
         {
          m_disconnectedSinceMs=nowMs;
          g_llbLog.Warn("CRD","broker connection lost - no new orders; broker-side SL/TP keep protecting open positions");
-         if(m_recoveryDone)
-            Notify(LLB_IconWarn()+" Broker connection lost. No new orders until reconnection; broker SL/TP remain active.");
+        }
+      if(!conn && m_disconnectedSinceMs>0 && !m_lossNotified && m_recoveryDone && nowMs-m_disconnectedSinceMs>=30000)
+        {
+         m_lossNotified=true;
+         Notify(LLB_IconWarn()+" Broker connection lost for 30+ s. No new orders until reconnection; broker SL/TP remain active.");
         }
       m_wasConnected=conn;
       bool stable=m_tester ? true : (conn && nowMs-m_connectedSinceMs>=(long)LLB_CONNECT_SETTLE_SEC*1000);
