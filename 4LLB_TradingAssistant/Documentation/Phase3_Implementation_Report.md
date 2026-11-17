@@ -84,6 +84,8 @@ Giới hạn: công cụ tĩnh **không** kiểm tra kiểu dữ liệu, const-c
 | I-06 | Đánh giá nến yêu cầu `r[1].time` = nến kỳ vọng | Tránh đánh giá nhầm nến khi nến mới mở giữa `iTime` và `CopyRates` |
 | I-07 | Recovery quét cả lịch sử lệnh 3 ngày để nhận lại lệnh "mồ côi" | Lệnh khớp/đóng lúc EA tắt mà journal hỏng vẫn được liên kết, Proposal không kẹt ở ACCEPTED |
 | I-08 | Lời nhắn lỗi mạng Telegram luôn kèm gợi ý allowlist WebRequest | Tài liệu MQL5 không nêu mã lỗi riêng cho "URL chưa được phép" |
+| I-09 | `InpSwingLookbackBars` mặc định 672 → **1920** (≈ 20 ngày M15) | Chạy thật 2026-11-17 trên XAUUSDc: không có Pivot Low nào dưới PDL trong 7 ngày ⇒ `P3_MISSING` ⇒ theo SRS không thể có tín hiệu |
+| I-10 | Dashboard: bỏ cột symbol bị tắt, input góc hiển thị, bấm để thu gọn (`OnChartEvent`), nền vẽ sau nến | Người dùng báo dashboard che biểu đồ; vẫn chỉ hiển thị, không có nút giao dịch |
 
 ## 5. Rủi ro compile cần chú ý ở lần build đầu
 

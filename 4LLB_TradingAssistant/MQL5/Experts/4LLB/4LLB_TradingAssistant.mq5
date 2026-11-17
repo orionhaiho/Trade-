@@ -31,7 +31,7 @@ input string             InpSymbols              = "XAUUSD,XAUUSDc";            
 input ENUM_TIMEFRAMES    InpAtrTimeframe         = PERIOD_M15;                  // ATR(14) timeframe [decision D-03]
 input ENUM_LLB_NEAREST   InpLevelNearestMode     = LLB_NEAREST_PRICE;           // P3/P4 "nearest" [decision D-02]
 input ENUM_LLB_SWING_REF InpSwingRefMode         = LLB_SWINGREF_SETUP_EXTREME;  // Swing for SL / invalidation [decision D-01]
-input int                InpSwingLookbackBars    = 672;                         // P3/P4 search window in M15 bars (672 = 7 days)
+input int                InpSwingLookbackBars    = 1920;                        // P3/P4 search window in M15 bars (1920 = 20 days)
 input bool               InpEnableSweep          = true;                        // Liquidity Sweep strategy
 input bool               InpEnableBreakout       = true;                        // Breakout strategy
 input int                InpMaxStartupBarAgeSec  = 60;                          // Start-up: evaluate the last bar only if closed <= N s ago
@@ -58,6 +58,8 @@ input int                InpTgHttpTimeoutMs      = 5000;                        
 
 input group "=== 5. Dashboard & logs ==="
 input bool               InpShowDashboard        = true;                        // Show the chart dashboard
+input ENUM_LLB_DASH_POS  InpDashboardPosition    = LLB_DASH_TOP_LEFT;           // Dashboard corner
+input bool               InpDashboardCollapsed   = false;                       // Start collapsed (click the panel to expand/collapse)
 input ENUM_LLB_LOG_LEVEL InpLogLevel             = LLB_LOG_INFO;                // Log level
 input bool               InpLogToFile            = true;                        // Also write daily log files
 
@@ -93,6 +95,8 @@ int OnInit(void)
    cfg.tgPollMs           =InpTgPollIntervalMs;
    cfg.tgTimeoutMs        =InpTgHttpTimeoutMs;
    cfg.showDashboard      =InpShowDashboard;
+   cfg.dashPos            =(int)InpDashboardPosition;
+   cfg.dashCollapsed      =InpDashboardCollapsed;
    cfg.logLevel           =(int)InpLogLevel;
    cfg.logToFile          =InpLogToFile;
    cfg.testerAutoApprove  =InpTesterAutoApprove;
@@ -112,6 +116,11 @@ void OnTimer(void)
 void OnTick(void)
   {
    g_llbCoordinator.OnTickEA();
+  }
+
+void OnChartEvent(const int id,const long &lparam,const double &dparam,const string &sparam)
+  {
+   g_llbCoordinator.OnChartEventEA(id,sparam);
   }
 
 void OnTradeTransaction(const MqlTradeTransaction &trans,const MqlTradeRequest &request,const MqlTradeResult &result)

@@ -52,6 +52,8 @@ struct LLBConfig
    int               tgPollMs;
    int               tgTimeoutMs;
    bool              showDashboard;
+   int               dashPos;
+   bool              dashCollapsed;
    int               logLevel;
    bool              logToFile;
    bool              testerAutoApprove;
@@ -924,39 +926,41 @@ private:
          hdr+=" | SYNCING";
       if(m_lockLost)
          hdr+=" | LOCK LOST";
+      int col=-1;
       for(int s=0; s<ArraySize(m_sym); s++)
         {
          int d=m_sym[s].spec.digits;
          if(!m_sym[s].enabled)
            {
-            DL(lines,cols,clrs,s,"["+m_sym[s].name+"] "+m_sym[s].status,clrTomato);
+            hdr+=" | "+m_sym[s].name+" off";            // unavailable symbol: one word in the header, no column
             continue;
            }
-         DL(lines,cols,clrs,s,StringFormat("[%s] Bid %s Ask %s Spr %d",m_sym[s].name,DoubleToString(m_sym[s].bid,d),
+         col++;
+         DL(lines,cols,clrs,col,StringFormat("[%s] Bid %s Ask %s Spr %d",m_sym[s].name,DoubleToString(m_sym[s].bid,d),
                                            DoubleToString(m_sym[s].ask,d),m_sym[s].spreadPts),clrWhite);
-         DL(lines,cols,clrs,s,"ATR(14,"+LLB_TfName(m_cfg.atrTf)+") "+DoubleToString(m_sym[s].atr,d)+" | "+m_sym[s].dataStatus,
+         DL(lines,cols,clrs,col,"ATR(14,"+LLB_TfName(m_cfg.atrTf)+") "+DoubleToString(m_sym[s].atr,d)+" | "+m_sym[s].dataStatus,
             (m_sym[s].dataStatus=="OK") ? clrWhite : clrOrange);
          LLBLevels lv=m_sym[s].levels;
-         DL(lines,cols,clrs,s,"P4 "+DoubleToString(lv.p4,d)+" | P1(PDH) "+DoubleToString(lv.pdh,d),clrKhaki);
-         DL(lines,cols,clrs,s,"P2(PDL) "+DoubleToString(lv.pdl,d)+" | P3 "+DoubleToString(lv.p3,d),clrKhaki);
+         DL(lines,cols,clrs,col,"P4 "+DoubleToString(lv.p4,d)+" | P1(PDH) "+DoubleToString(lv.pdh,d),clrKhaki);
+         DL(lines,cols,clrs,col,"P2(PDL) "+DoubleToString(lv.pdl,d)+" | P3 "+DoubleToString(lv.p3,d),clrKhaki);
          int pidx=m_pm.LatestForSymbol(m_sym[s].name);
          if(pidx<0)
-            DL(lines,cols,clrs,s,"Signal: -",clrSilver);
+            DL(lines,cols,clrs,col,"Signal: -",clrSilver);
          else
            {
             LLBTradeProposal p=m_pm.items[pidx];
             long left=(long)p.expiresTime-(long)now;
-            DL(lines,cols,clrs,s,"Signal: "+p.signalId,StateColor(p.state));
-            DL(lines,cols,clrs,s,"  "+LLB_StrategyName(p.strategy)+" "+LLB_DirName(p.direction)+" @"+LLB_LevelName(p.level)+" "
+            DL(lines,cols,clrs,col,"Signal: "+p.signalId,StateColor(p.state));
+            DL(lines,cols,clrs,col,"  "+LLB_StrategyName(p.strategy)+" "+LLB_DirName(p.direction)+" @"+LLB_LevelName(p.level)+" "
                +LLB_ProposalStateName(p.state)+((p.state==LLB_PS_ACTIVE) ? " left "+LLB_Countdown(left) : "")+" exp "+LLB_HMS(p.expiresTime),StateColor(p.state));
-            DL(lines,cols,clrs,s,"  E "+DoubleToString(p.entry,d)+" SL "+DoubleToString(p.sl,d)+" TP "+DoubleToString(p.tp,d)+" RR "+DoubleToString(p.rr,2),clrWhite);
-            DL(lines,cols,clrs,s,"  Ref swing "+DoubleToString(p.refSwingPrice,d),clrWhite);
+            DL(lines,cols,clrs,col,"  E "+DoubleToString(p.entry,d)+" SL "+DoubleToString(p.sl,d)+" TP "+DoubleToString(p.tp,d)+" RR "+DoubleToString(p.rr,2),clrWhite);
+            DL(lines,cols,clrs,col,"  Ref swing "+DoubleToString(p.refSwingPrice,d),clrWhite);
             int e=m_em.FindBySignal(p.signalId);
             if(e>=0)
-               DL(lines,cols,clrs,s,"Exec "+m_em.items[e].execId+" "+LLB_ExecStateName(m_em.items[e].state)+"/"+LLB_OrderStateName(m_em.items[e].orderState)
+               DL(lines,cols,clrs,col,"Exec "+m_em.items[e].execId+" "+LLB_ExecStateName(m_em.items[e].state)+"/"+LLB_OrderStateName(m_em.items[e].orderState)
                   +" #"+IntegerToString((long)m_em.items[e].orderTicket)+" "+DoubleToString(m_em.items[e].volume,2),clrWhite);
             else
-               DL(lines,cols,clrs,s,"Exec: -",clrSilver);
+               DL(lines,cols,clrs,col,"Exec: -",clrSilver);
            }
          int q=-1;
          for(int i=m_pos.Count()-1; i>=0; i--)
@@ -971,20 +975,20 @@ private:
                   q=i;
               }
          if(q<0)
-            DL(lines,cols,clrs,s,"Pos: -",clrSilver);
+            DL(lines,cols,clrs,col,"Pos: -",clrSilver);
          else
            {
             LLBManagedPosition m=m_pos.items[q];
             if(m.state!=LLB_POS_CLOSED)
               {
-               DL(lines,cols,clrs,s,StringFormat("Pos #%I64d %s %s @%s P/L %s",m.positionId,LLB_DirName(m.direction),DoubleToString(m.volume,2),
+               DL(lines,cols,clrs,col,StringFormat("Pos #%I64d %s %s @%s P/L %s",m.positionId,LLB_DirName(m.direction),DoubleToString(m.volume,2),
                                                  DoubleToString(m.openPrice,d),DoubleToString(m.floating,2)),(m.floating>=0.0) ? clrLime : clrTomato);
-               DL(lines,cols,clrs,s,"  SL "+DoubleToString(m.sl,d)+" TP "+DoubleToString(m.tp,d)+(m.sltpVerified ? " [ok]" : " [CHECK]")
+               DL(lines,cols,clrs,col,"  SL "+DoubleToString(m.sl,d)+" TP "+DoubleToString(m.tp,d)+(m.sltpVerified ? " [ok]" : " [CHECK]")
                   +" "+LLB_StructStateName(m.structState)+((m.ownership==LLB_OWN_CONFLICT) ? " CONFLICT" : "")+" "+LLB_PosStateName(m.state),
                   (m.structState==LLB_ST_INTACT && m.sltpVerified) ? clrWhite : clrOrange);
               }
             else
-               DL(lines,cols,clrs,s,StringFormat("Last pos #%I64d closed %s P/L %s",m.positionId,LLB_CloseReasonName(m.closeReason),
+               DL(lines,cols,clrs,col,StringFormat("Last pos #%I64d closed %s P/L %s",m.positionId,LLB_CloseReasonName(m.closeReason),
                                                  DoubleToString(m.profit+m.commission+m.swap+m.fee,2)),clrSilver);
            }
         }
@@ -1140,7 +1144,7 @@ public:
         }
       m_apr.Init(GetPointer(m_pm),GetPointer(m_em),GetPointer(m_tg),GetPointer(this));
       bool dashOn=(m_cfg.showDashboard && (!m_tester || (bool)MQLInfoInteger(MQL_VISUAL_MODE)));
-      m_dash.Init(dashOn,"4LLB_DASH_");
+      m_dash.Init(dashOn,"4LLB_DASH_",m_cfg.dashPos,m_cfg.dashCollapsed);
       if(!EventSetMillisecondTimer(LLB_TIMER_MS))
         {
          Fatal("EventSetMillisecondTimer failed");
@@ -1295,6 +1299,15 @@ public:
       int s=SymIndex(_Symbol);
       if(s>=0 && m_sym[s].enabled)
          ScanSymbol(s,false);
+     }
+
+   //--- dashboard click: collapse / expand only (display, never trading)
+   void              OnChartEventEA(const int id,const string sparam)
+     {
+      if(!m_initOk || id!=CHARTEVENT_OBJECT_CLICK)
+         return;
+      if(m_dash.OnClick(sparam))
+         UpdateDashboard(TimeTradeServer());
      }
 
    //--- trade events only trigger an early reconciliation (not a source of truth)

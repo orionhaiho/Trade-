@@ -62,7 +62,7 @@ Gắn EA vào **một chart duy nhất** (ví dụ XAUUSD M15 — khung chart kh
 | 1 | `InpAtrTimeframe` | `M15` | Khung ATR(14) — quyết định **D-03** |
 | 1 | `InpLevelNearestMode` | `Nearest by price` | "Gần nhất" khi chọn P3/P4 — **D-02** |
 | 1 | `InpSwingRefMode` | `Setup extreme` | Swing tham chiếu SL/invalidation — **D-01** |
-| 1 | `InpSwingLookbackBars` | `672` | Cửa sổ tìm P3/P4 (672 nến M15 ≈ 7 ngày) |
+| 1 | `InpSwingLookbackBars` | `1920` | Cửa sổ tìm P3/P4 (1920 nến M15 ≈ 20 ngày). Dashboard báo `levels P3_MISSING`/`P4_MISSING` ⇒ không có tín hiệu; tăng giá trị này nếu muốn tìm xa hơn |
 | 1 | `InpEnableSweep` / `InpEnableBreakout` | `true` | Bật/tắt từng chiến lược |
 | 1 | `InpMaxStartupBarAgeSec` | `60` | Lúc khởi động chỉ đánh giá nến vừa đóng ≤ 60 s (không tạo tín hiệu cũ) |
 | 2 | `InpLotMode` | `Fixed LotSize` | **D-04**; đổi sang `RiskPercent` nếu muốn |
@@ -73,7 +73,8 @@ Gắn EA vào **một chart duy nhất** (ví dụ XAUUSD M15 — khung chart kh
 | 3 | `InpCloseDeviationPoints` | `50` | Trượt giá tối đa khi đóng do invalidation |
 | 3 | `InpAllowEaManagedExpiry` | `false` | Chỉ bật nếu broker không hỗ trợ expiration "Specified" (EA phải online để xoá lệnh) |
 | 4 | Telegram | — | Xem hướng dẫn Telegram |
-| 5 | `InpShowDashboard`, `InpLogLevel`, `InpLogToFile` | `true`, `Info`, `true` | Hiển thị & log |
+| 5 | `InpShowDashboard`, `InpDashboardPosition`, `InpDashboardCollapsed` | `true`, `Top left`, `false` | Dashboard: góc hiển thị; **bấm vào dashboard để thu gọn/mở rộng** (chỉ hiển thị, không có nút giao dịch) |
+| 5 | `InpLogLevel`, `InpLogToFile` | `Info`, `true` | Log |
 | 6 | `InpTesterAutoApprove` | `false` | **Chỉ trong Strategy Tester**; bật trên chart thật ⇒ EA từ chối khởi động |
 
 Các tham số chiến lược của SRS (0.05–0.50 ATR, 0.10 ATR, 0.15 ATR, 4 nến, buffer, RR 1:2, 15/30 phút, Pivot 3-3) **không** phải input — nằm trong `LLB_Defines.mqh` để không bị đổi nhầm.
