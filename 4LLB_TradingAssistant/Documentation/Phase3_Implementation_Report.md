@@ -1,6 +1,6 @@
 # Phase 3 — Implementation Report
 
-**Trạng thái:** `Implemented` + `Static-reviewed`. **CHƯA `Compiled`** — môi trường này không có MetaEditor/MT5. Người dùng compile trên MT5 Exness (Phase 4 §1) và gửi lại tab *Errors* nếu có.
+**Trạng thái:** `Implemented` + `Static-reviewed` + **`Compiled`** — người dùng compile bằng MetaEditor trên MT5 Exness ngày 2026-11-17: `4LLB_TradingAssistant.mq5` và `4LLB_UnitTests.mq5` đều **0 errors, 0 warnings** (build MetaEditor chưa ghi nhận). Chưa có kết quả chạy unit test.
 
 ## 1. Cây thư mục
 
@@ -106,3 +106,9 @@ STATUS: PASS (Implemented + Static-reviewed) — chờ COMPILE trên MT5 của n
 6. User decisions required: không.
 7. Next: Phase 4 — compile + chạy 4LLB_UnitTests trên MT5 (entry: copy file theo Installation_Guide.md).
 ```
+
+## 6. Kết quả compile
+
+| Ngày | Môi trường | File | Kết quả | Bằng chứng |
+|---|---|---|---|---|
+| 2026-11-17 | MetaEditor (MT5 Exness) trên Windows của người dùng | `Experts/4LLB/4LLB_TradingAssistant.mq5`, `Scripts/4LLB/4LLB_UnitTests.mq5` | 0 errors, 0 warnings | Người dùng báo lại trong phiên làm việc |

@@ -11,7 +11,7 @@ EA cho MetaTrader 5 (Exness) theo dõi **XAUUSD / XAUUSDc**, xác định **4 m�
 | Designed (Phase 0–2) | ✅ | `Documentation/Phase0…`, `Phase1…`, `Phase2…` |
 | Implemented (Phase 3) | ✅ | `MQL5/` (~9.000 dòng) |
 | Static-reviewed | ✅ | `Tools/mql5_static_check.py` → 0 lỗi; `Tools/reference_model_test.py` → 50/50 |
-| Compiled | ⏳ chờ bạn | Môi trường phát triển không có MetaEditor — compile theo `Installation_Guide.md` §3 |
+| Compiled | ✅ 2026-11-17 | Người dùng compile bằng MetaEditor (MT5 Exness): EA + script unit test **0 errors, 0 warnings** |
 | Unit-tested trên MT5 | ⏳ chờ bạn | `4LLB_UnitTests.mq5` (139 assert) |
 | Backtested / Demo-verified / Production-ready | ❌ chưa | `Installation_Guide.md` §9 (Release Gate) |
 

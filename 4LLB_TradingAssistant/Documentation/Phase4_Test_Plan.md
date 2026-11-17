@@ -152,7 +152,7 @@ REFERENCE MODEL: 50 passed, 0 failed
 
 ```text
 PHASE: 4 — Testing & Verification
-STATUS: BLOCKED (chờ compile + chạy unit test trên MT5 của người dùng)
+STATUS: BLOCKED (đã compile 0 lỗi/0 cảnh báo ngày 2026-11-17; chờ kết quả chạy unit test trên MT5)
 1. Deliverables: test plan (SRS + XT), script 4LLB_UnitTests.mq5 (139 assert), 2 công cụ kiểm tra.
 2. Requirements covered: mọi requirement có ít nhất một test (bảng trên).
 3. Technical decisions: test SRS được suy ra từ baseline (A-30).
