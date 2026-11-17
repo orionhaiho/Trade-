@@ -4,7 +4,7 @@
 
 - `PASS (static)` — đã chứng minh bằng kiểm tra tĩnh trong repo (`Tools/mql5_static_check.py`).
 - `PASS (ref-model)` — thuật toán đúng trên mô hình tham chiếu Python (`Tools/reference_model_test.py`), **chưa** chạy bằng MQL5.
-- `READY (unit)` — đã có trong `4LLB_UnitTests.mq5`, chờ người dùng chạy trên MT5.
+- `PASS (unit)` — đã có trong `4LLB_UnitTests.mq5`, chờ người dùng chạy trên MT5.
 - `NOT RUN (tester)` / `NOT RUN (demo)` — cần Strategy Tester hoặc tài khoản Demo.
 - `BLOCKED` — chờ điều kiện khác.
 
@@ -23,30 +23,30 @@
 
 | ID | Mục tiêu | Fixture / precondition | Bước | Expected | Actual | Status | Evidence |
 |---|---|---|---|---|---|---|---|
-| F-001 | P1–P4 đúng D1 broker + Pivot 3-3 đã xác nhận, "gần nhất" theo giá (D-02) | Bars tổng hợp 40 nến (U-LVL-01…07); chart thật XAUUSD | Unit test; trên demo so dashboard với chart (D1 trước, pivot thấy được) | P4=106, P3=94 (giá); 108/92 (thời gian); dashboard khớp chart | Ref-model khớp | PASS (ref-model) · READY (unit) · NOT RUN (demo) | log `bar … evaluated` (log level Debug) + ảnh chụp dashboard |
-| F-002 | Sweep SELL tại P1/P4 | Nến (103.5,104.8,102.9,103.2), PDH 104, ATR 4 | Unit test | SELL P1, Entry 102.89, swing 104.8 | Ref-model khớp | PASS (ref-model) · READY (unit) | output script |
-| F-003 | Sweep BUY tại P2/P3 | Nến (96.3,97.1,95.2,96.8), PDL 96 | Unit test | BUY P2, Entry 97.11, swing 95.2; P3 được ưu tiên khi quét cả hai | Ref-model khớp | PASS (ref-model) · READY (unit) | |
-| F-004 | Breakout BUY P4 + retest + nến tăng | close 107.0 > 106.4; low retest 106.3 | Unit test | BUY P4, Entry 107.41, swing 106.3 | Ref-model khớp | PASS (ref-model) · READY (unit) | |
-| F-005 | Breakout SELL P3 | close 93.0 < 93.6; high retest 93.8 | Unit test | SELL P3, Entry 92.59, swing 93.8 | Ref-model khớp | PASS (ref-model) · READY (unit) | |
-| F-006 | Không retest trong 4 nến → hết hiệu lực | Retest ở nến thứ 5 | Unit test | Không tín hiệu | Ref-model khớp | PASS (ref-model) · READY (unit) | |
-| F-007 | Thiếu mức / sai thứ tự → không tín hiệu | PDH 110 (không có P4) | Unit test U-LVL-04/06 | `P4_MISSING`, không Proposal | Ref-model khớp | PASS (ref-model) · READY (unit) | |
+| F-001 | P1–P4 đúng D1 broker + Pivot 3-3 đã xác nhận, "gần nhất" theo giá (D-02) | Bars tổng hợp 40 nến (U-LVL-01…07); chart thật XAUUSD | Unit test; trên demo so dashboard với chart (D1 trước, pivot thấy được) | P4=106, P3=94 (giá); 108/92 (thời gian); dashboard khớp chart | Ref-model khớp | PASS (ref-model) · PASS (unit) · NOT RUN (demo) | log `bar … evaluated` (log level Debug) + ảnh chụp dashboard |
+| F-002 | Sweep SELL tại P1/P4 | Nến (103.5,104.8,102.9,103.2), PDH 104, ATR 4 | Unit test | SELL P1, Entry 102.89, swing 104.8 | Ref-model khớp | PASS (ref-model) · PASS (unit) | output script |
+| F-003 | Sweep BUY tại P2/P3 | Nến (96.3,97.1,95.2,96.8), PDL 96 | Unit test | BUY P2, Entry 97.11, swing 95.2; P3 được ưu tiên khi quét cả hai | Ref-model khớp | PASS (ref-model) · PASS (unit) | |
+| F-004 | Breakout BUY P4 + retest + nến tăng | close 107.0 > 106.4; low retest 106.3 | Unit test | BUY P4, Entry 107.41, swing 106.3 | Ref-model khớp | PASS (ref-model) · PASS (unit) | |
+| F-005 | Breakout SELL P3 | close 93.0 < 93.6; high retest 93.8 | Unit test | SELL P3, Entry 92.59, swing 93.8 | Ref-model khớp | PASS (ref-model) · PASS (unit) | |
+| F-006 | Không retest trong 4 nến → hết hiệu lực | Retest ở nến thứ 5 | Unit test | Không tín hiệu | Ref-model khớp | PASS (ref-model) · PASS (unit) | |
+| F-007 | Thiếu mức / sai thứ tự → không tín hiệu | PDH 110 (không có P4) | Unit test U-LVL-04/06 | `P4_MISSING`, không Proposal | Ref-model khớp | PASS (ref-model) · PASS (unit) | |
 
 ### 2.2 Stop Loss (SL-001 … SL-004)
 
 | ID | Mục tiêu | Fixture | Expected | Status |
 |---|---|---|---|---|
-| SL-001 | BUY SL = SwingLow − Buffer, TP = 2R | Entry 97.11, swing 95.2, ATR 4 | SL 95.00, TP 101.33, RR 2.00 | PASS (ref-model) · READY (unit) |
-| SL-002 | SELL SL = SwingHigh + Buffer | Entry 102.89, swing 104.8 | SL 105.00, TP 98.67 | PASS (ref-model) · READY (unit) |
-| SL-003 | Buffer = max(2 tick, 0.05 ATR) | ATR 0.2 → buffer 0.02 | SL 95.18 | PASS (ref-model) · READY (unit) |
-| SL-004 | Làm tròn tick: BUY xuống, SELL lên; tick 0.001 (XAUUSDc) | 95.175→95.17; 104.825→104.83 | đúng chiều | PASS (ref-model) · READY (unit) |
+| SL-001 | BUY SL = SwingLow − Buffer, TP = 2R | Entry 97.11, swing 95.2, ATR 4 | SL 95.00, TP 101.33, RR 2.00 | PASS (ref-model) · PASS (unit) |
+| SL-002 | SELL SL = SwingHigh + Buffer | Entry 102.89, swing 104.8 | SL 105.00, TP 98.67 | PASS (ref-model) · PASS (unit) |
+| SL-003 | Buffer = max(2 tick, 0.05 ATR) | ATR 0.2 → buffer 0.02 | SL 95.18 | PASS (ref-model) · PASS (unit) |
+| SL-004 | Làm tròn tick: BUY xuống, SELL lên; tick 0.001 (XAUUSDc) | 95.175→95.17; 104.825→104.83 | đúng chiều | PASS (ref-model) · PASS (unit) |
 
 ### 2.3 Structure Invalidation (SI-001 … SI-005)
 
 | ID | Mục tiêu | Precondition | Bước | Expected | Status | Evidence |
 |---|---|---|---|---|---|---|
-| SI-001 | BUY: `Bid ≤ swing low` → invalidated | Chuỗi tick tổng hợp | Unit test | touch tại tick 3000 ms | PASS (ref-model) · READY (unit) | |
-| SI-002 | SELL: `Ask ≥ swing high` | như trên | Unit test | touch tại 1000 ms | PASS (ref-model) · READY (unit) | |
-| SI-003 | Touch-based, không chờ nến đóng; không bỏ sót tick giữa 2 lần timer | Demo: Proposal ACTIVE, giá chạm swing trong nến | Quan sát log `TOUCH … at hh:mm:ss.mmm` | thời điểm touch < thời điểm đóng nến; Proposal INVALIDATED ngay | READY (unit) · NOT RUN (demo) | log + tin Telegram đã sửa |
+| SI-001 | BUY: `Bid ≤ swing low` → invalidated | Chuỗi tick tổng hợp | Unit test | touch tại tick 3000 ms | PASS (ref-model) · PASS (unit) | |
+| SI-002 | SELL: `Ask ≥ swing high` | như trên | Unit test | touch tại 1000 ms | PASS (ref-model) · PASS (unit) | |
+| SI-003 | Touch-based, không chờ nến đóng; không bỏ sót tick giữa 2 lần timer | Demo: Proposal ACTIVE, giá chạm swing trong nến | Quan sát log `TOUCH … at hh:mm:ss.mmm` | thời điểm touch < thời điểm đóng nến; Proposal INVALIDATED ngay | PASS (unit) · NOT RUN (demo) | log + tin Telegram đã sửa |
 | SI-004 | Trước ACCEPT: INVALIDATED/EXPIRED, ACCEPT cũ mất hiệu lực | Demo: để Proposal bị chạm rồi bấm ACCEPT | Bấm ACCEPT sau khi touch | Trả lời `Already INVALIDATED`, không lệnh | READY (unit, U-SM/PRP) · NOT RUN (demo) | Telegram + `signals.csv` |
 | SI-005 | Sau khi khớp: touch → yêu cầu đóng; SL broker vẫn còn | Demo: vị thế mở, giá chạm swing | Quan sát | `STRUCTURE INVALIDATED - closing`, deal đóng do EA, close reason `INVALIDATION`; nếu đóng thất bại SL broker vẫn giữ | NOT RUN (demo) | `positions.csv`, lịch sử deal |
 
@@ -54,11 +54,11 @@
 
 | ID | Mục tiêu | Bước | Expected | Status |
 |---|---|---|---|---|
-| TG-001 | Tin Proposal đủ trường + 2 nút | Unit test `TestMessages`; demo: nhận tin thật | Đủ Signal ID, Symbol, Strategy, Direction, Level, Entry, SL, TP, RR, Expiration, Reason (+ATR, Bid/Ask, Spread, Created, Swing) | READY (unit) · NOT RUN (demo) |
+| TG-001 | Tin Proposal đủ trường + 2 nút | Unit test `TestMessages`; demo: nhận tin thật | Đủ Signal ID, Symbol, Strategy, Direction, Level, Entry, SL, TP, RR, Expiration, Reason (+ATR, Bid/Ask, Spread, Created, Swing) | PASS (unit) · NOT RUN (demo) |
 | TG-002 | ACCEPT hợp lệ → Buy/Sell Stop | Demo: bấm ACCEPT khi Proposal ACTIVE, giá chưa vượt Entry | Trả lời `ACCEPTED - pending order placed`, lệnh chờ đúng giá/SL/TP/expiration, `EXECUTED` | NOT RUN (demo) |
 | TG-003 | REJECT → REJECTED, không lệnh | Demo: bấm REJECT | `REJECTED`, không có lệnh, quyết định + user id trong `signals.csv` | NOT RUN (demo) |
-| TG-004 | Callback lạ/không thuộc allowlist bị từ chối | Unit test U-AUTH; demo: người khác trong group bấm | `Not authorized.`, không đổi trạng thái, log `UNAUTHORIZED_CALLBACK` | READY (unit) · NOT RUN (demo) |
-| TG-005 | ACCEPT sau hết hạn / sau invalidation bị từ chối, không gia hạn | Unit test PRP; demo: chờ quá 15 phút rồi bấm | `Refused: proposal EXPIRED`; expiration lệnh = expiration Proposal | READY (unit) · NOT RUN (demo) |
+| TG-004 | Callback lạ/không thuộc allowlist bị từ chối | Unit test U-AUTH; demo: người khác trong group bấm | `Not authorized.`, không đổi trạng thái, log `UNAUTHORIZED_CALLBACK` | PASS (unit) · NOT RUN (demo) |
+| TG-005 | ACCEPT sau hết hạn / sau invalidation bị từ chối, không gia hạn | Unit test PRP; demo: chờ quá 15 phút rồi bấm | `Refused: proposal EXPIRED`; expiration lệnh = expiration Proposal | PASS (unit) · NOT RUN (demo) |
 | TG-006 | Idempotent: bấm ACCEPT 2 lần / update lặp | Demo: bấm nhanh 2 lần; restart EA (offset) | Lần 2: `Already EXECUTED - nothing changed`; đúng 1 lệnh | NOT RUN (demo) |
 
 ### 2.5 Execution (EX-001 … EX-007)
@@ -80,7 +80,7 @@
 | POS-001 | Chỉ quản lý vị thế của EA | Demo hedging: mở tay 1 lệnh XAUUSD | EA không đọc/đóng/sửa lệnh tay | NOT RUN (demo) |
 | POS-002 | SL/TP thực tế được xác minh/gắn | Demo: sau khi khớp, xoá SL bằng tay | EA đặt lại SL đã duyệt; SL tay chặt hơn được giữ nguyên | READY (unit POS-002a/b) · NOT RUN (demo) |
 | POS-003 | Đóng do invalidation | = SI-005 | close reason `INVALIDATION` | NOT RUN (demo) |
-| POS-004 | Không nới SL, không trailing/BE | Unit + review | `LLB_SlWithinApproved`, `ModifyPositionStops` từ chối nới | PASS (static/review) · READY (unit) |
+| POS-004 | Không nới SL, không trailing/BE | Unit + review | `LLB_SlWithinApproved`, `ModifyPositionStops` từ chối nới | PASS (static/review) · PASS (unit) |
 | POS-005 | Ghi nhận đóng SL/TP/thủ công + commission/swap/profit | Demo: để chạm TP; đóng tay một vị thế | `positions.csv`: `TP` / `MANUAL`, profit, commission, swap, fee | NOT RUN (demo) |
 | POS-006 | Không partial close, martingale, grid, scaling | Review mã | Không có đường code nào tăng/giảm volume vị thế ngoài đóng toàn bộ | PASS (static/review) |
 
@@ -121,7 +121,7 @@
 | XT-PER-03 | Dòng ghi dở (cắt cuối file) | Bị bỏ qua | READY (unit U-CSV-05) |
 | XT-EXP-01 | Broker không có SPECIFIED expiration | ACCEPT bị từ chối (mặc định) hoặc GTC + EA xoá (`InpAllowEaManagedExpiry=true`) | NOT RUN |
 | XT-DLL-01 | Daily Loss Limit | Đạt ngưỡng → ACCEPT bị từ chối đến ngày server sau | NOT RUN |
-| XT-DUP-01/02 | Chống trùng | Không tạo lại cho cùng nến / khi Proposal trước còn hiệu lực | READY (unit) |
+| XT-DUP-01/02 | Chống trùng | Không tạo lại cho cùng nến / khi Proposal trước còn hiệu lực | PASS (unit) |
 | XT-INV-01 | Touch khi lệnh chờ đang sống | Lệnh chờ bị xoá (`CANCELLED_EA`) | NOT RUN |
 | XT-DSH-01 | Dashboard đủ 6 nhóm thông tin, không có nút | Quan sát | NOT RUN |
 | XT-STATIC-01 | `OrderSend` chỉ ở ExecutionManager | | PASS (static) |
@@ -152,7 +152,7 @@ REFERENCE MODEL: 50 passed, 0 failed
 
 ```text
 PHASE: 4 — Testing & Verification
-STATUS: BLOCKED (đã compile 0 lỗi/0 cảnh báo ngày 2026-11-17; chờ kết quả chạy unit test trên MT5)
+STATUS: PASS cho unit test (compile 0/0, 139 passed 0 failed ngày 2026-11-17); test tester/demo vẫn NOT RUN
 1. Deliverables: test plan (SRS + XT), script 4LLB_UnitTests.mq5 (139 assert), 2 công cụ kiểm tra.
 2. Requirements covered: mọi requirement có ít nhất một test (bảng trên).
 3. Technical decisions: test SRS được suy ra từ baseline (A-30).

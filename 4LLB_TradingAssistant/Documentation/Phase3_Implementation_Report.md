@@ -1,6 +1,6 @@
 # Phase 3 — Implementation Report
 
-**Trạng thái:** `Implemented` + `Static-reviewed` + **`Compiled`** — người dùng compile bằng MetaEditor trên MT5 Exness ngày 2026-11-17: `4LLB_TradingAssistant.mq5` và `4LLB_UnitTests.mq5` đều **0 errors, 0 warnings** (build MetaEditor chưa ghi nhận). Chưa có kết quả chạy unit test.
+**Trạng thái:** `Implemented` + `Static-reviewed` + **`Compiled`** — người dùng compile bằng MetaEditor trên MT5 Exness ngày 2026-11-17: `4LLB_TradingAssistant.mq5` và `4LLB_UnitTests.mq5` đều **0 errors, 0 warnings** (build MetaEditor chưa ghi nhận). Unit test MQL5: **139 passed, 0 failed** (2026-11-17).
 
 ## 1. Cây thư mục
 
@@ -112,3 +112,9 @@ STATUS: PASS (Implemented + Static-reviewed) — chờ COMPILE trên MT5 của n
 | Ngày | Môi trường | File | Kết quả | Bằng chứng |
 |---|---|---|---|---|
 | 2026-11-17 | MetaEditor (MT5 Exness) trên Windows của người dùng | `Experts/4LLB/4LLB_TradingAssistant.mq5`, `Scripts/4LLB/4LLB_UnitTests.mq5` | 0 errors, 0 warnings | Người dùng báo lại trong phiên làm việc |
+
+## 7. Kết quả unit test MQL5
+
+| Ngày | Chart | Kết quả | Ghi chú |
+|---|---|---|---|
+| 2026-11-17 21:30–21:31 | XAUUSDc, M15 (MT5 Exness) | `4LLB UNIT TESTS: 139 passed, 0 failed` / `ALL PASSED` (3 lần chạy) | Dòng `[ERROR][PRP] ILLEGAL_TRANSITION … EXPIRED -> ACCEPTED (late accept)` là **cố ý**: test TG-005 xác nhận ACCEPT muộn không hồi sinh được Proposal đã hết hạn |
