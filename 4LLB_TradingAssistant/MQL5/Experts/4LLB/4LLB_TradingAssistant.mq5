@@ -120,7 +120,7 @@ void OnTick(void)
 
 void OnChartEvent(const int id,const long &lparam,const double &dparam,const string &sparam)
   {
-   g_llbCoordinator.OnChartEventEA(id,sparam);
+   g_llbCoordinator.OnChartEventEA(id,lparam,dparam);
   }
 
 void OnTradeTransaction(const MqlTradeTransaction &trans,const MqlTradeRequest &request,const MqlTradeResult &result)

@@ -1302,11 +1302,11 @@ public:
      }
 
    //--- dashboard click: collapse / expand only (display, never trading)
-   void              OnChartEventEA(const int id,const string sparam)
+   void              OnChartEventEA(const int id,const long lparam,const double dparam)
      {
-      if(!m_initOk || id!=CHARTEVENT_OBJECT_CLICK)
+      if(!m_initOk || id!=CHARTEVENT_CLICK)
          return;
-      if(m_dash.OnClick(sparam))
+      if(m_dash.OnChartClick((int)lparam,(int)dparam))
          UpdateDashboard(TimeTradeServer());
      }
 

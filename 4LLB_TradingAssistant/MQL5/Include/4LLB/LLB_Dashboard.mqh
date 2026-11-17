@@ -31,6 +31,10 @@ private:
    int               m_pos;
    string            m_prefix;
    int               m_drawn;     // number of line labels currently on the chart
+   int               m_x0;        // panel bounds in chart pixels (for the click hit-test)
+   int               m_y0;
+   int               m_w;
+   int               m_h;
 
    void              Label(const string name,const int x,const int y,const string text,const color clr)
      {
@@ -81,6 +85,10 @@ public:
       m_pos=LLB_DASH_TOP_LEFT;
       m_prefix="4LLB_DASH_";
       m_drawn=0;
+      m_x0=0;
+      m_y0=0;
+      m_w=0;
+      m_h=0;
      }
 
    void              Init(const bool enabled,const string prefix,const int position,const bool collapsed)
@@ -97,10 +105,13 @@ public:
       ChartRedraw(0);
      }
 
-   //--- click on any panel object toggles collapsed / expanded (display only)
-   bool              OnClick(const string objectName)
+   //--- a click anywhere inside the panel toggles collapsed / expanded (display only).
+   //--- CHARTEVENT_CLICK coordinates are used because background objects receive no object-click event.
+   bool              OnChartClick(const int x,const int y)
      {
-      if(!m_enabled || StringFind(objectName,m_prefix)!=0)
+      if(!m_enabled || m_w<=0)
+         return false;
+      if(x<m_x0 || x>m_x0+m_w || y<m_y0 || y>m_y0+m_h)
          return false;
       m_collapsed=!m_collapsed;
       return true;
@@ -149,6 +160,10 @@ public:
          ObjectsDeleteAll(0,m_prefix+"c");
          m_drawn=0;
         }
+      m_x0=x0;
+      m_y0=y0;
+      m_w=width;
+      m_h=height;
       Background(x0,y0,width,height);
       Label(m_prefix+"hdr",x0+6,y0+5,header+(m_collapsed ? "  [+]" : "  [-]"),clrGold);
       if(!m_collapsed)
