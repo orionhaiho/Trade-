@@ -1,0 +1,19 @@
+baseline audit on the real sources: PASS
+V01 DETECTED - direct OrderSend call -> forbidden identifier in code: MqlTradeRequest; forbidden identifier in code: MqlTradeResult; forbidden identifier in code: OrderSend
+V02 DETECTED - OrderSendAsync call -> forbidden identifier in code: OrderSendAsync; call to a function outside the read-only whitelist: OrderSendAsync
+V03 DETECTED - standard-library trade include -> standard-library include <Trade\Trade.mqh> (not allowed in M1)
+V04 DETECTED - CTrade object -> forbidden identifier in code: CTrade
+V05 DETECTED - PositionClose through a member -> forbidden identifier in code: PositionClose; call to a function outside the read-only whitelist: PositionClose
+V06 DETECTED - macro hiding a trade function -> forbidden identifier in code: OrderSend; macro body references a forbidden identifier: SAFE_CALL
+V07 DETECTED - function-like macro -> function-like macro (could hide a call): WRAP
+V08 DETECTED - conditional compilation branch -> conditional compilation other than an include guard: #ifdef ENABLE_TRADING
+V09 DETECTED - account API outside the data source -> AccountInfoDouble called outside CTerminalAccountDataSource
+V10 DETECTED - Sleep (blocking) -> forbidden identifier in code: Sleep; call to a function outside the read-only whitelist: Sleep
+V11 DETECTED - file access -> forbidden identifier in code: FileOpen; call to a function outside the read-only whitelist: FileOpen
+V12 DETECTED - chart UI output -> forbidden identifier in code: Comment; call to a function outside the read-only whitelist: Comment
+V13 DETECTED - call outside the whitelist -> call to a function outside the read-only whitelist: SomeUnknownFunction
+V14 DETECTED - DLL import -> #import (DLL / external library) present
+V15 DETECTED - dynamic allocation -> dynamic allocation keyword: new
+V16 DETECTED - trade call in an unused helper -> forbidden identifier in code: PositionModify; call to a function outside the read-only whitelist: PositionModify
+V17 DETECTED - network request -> forbidden identifier in code: WebRequest; call to a function outside the read-only whitelist: WebRequest
+missed: 0 of 17

@@ -1,0 +1,27 @@
+--- A: EA starts while the terminal is not yet connected (login still 0) ---
+[RiskManagement][2026.11.19 17:00:00][WARNING][TERMINAL_DISCONNECTED] Terminal is not connected to the trade server (first check after start)
+[RiskManagement][2026.11.19 17:00:00][WARNING][ACCOUNT_COLLECTION_FAILED] No valid account snapshot: status=UNAVAILABLE reason=TERMINAL_DISCONNECTED: terminal is not connected to the trade server (InpRequireConnectedTerminal=true) consecutive_failed_cycles=1 last_successful_collection=none
+[RiskManagement][2026.11.19 17:00:00][INFO][EA_INITIALIZED] RiskManagement M1 initialized (strict read-only). refresh_seconds=1 logging=true debug_logging=false require_connected_terminal=true. Account identity pending (no valid snapshot yet): NO_SUCCESSFUL_SNAPSHOT: latest collection status=UNAVAILABLE reason=TERMINAL_DISCONNECTED: terminal is not connected to the trade server (InpRequireConnectedTerminal=true)
+[RiskManagement][2026.11.19 17:00:04][INFO][TERMINAL_RECONNECTED] Terminal connected to the trade server (it was not connected when the EA started) after about 4 s
+[RiskManagement][2026.11.19 17:00:04][INFO][ACCOUNT_COLLECTION_SUCCESS] First valid account snapshot; identity baseline locked: login=12345678 server="Exness-MT5Real8" currency="USD" company="Exness Technologies Ltd" (after 4 failed cycle(s))
+--- B: invalid data (NaN equity) during 5 cycles, then recovery ---
+[RiskManagement][2026.11.19 17:00:06][ERROR][ACCOUNT_COLLECTION_FAILED] No valid account snapshot: status=INVALID reason=DATA_INVALID: ACCOUNT_EQUITY is not a finite number (NaN or Inf) consecutive_failed_cycles=1 last_successful_collection=2026.11.19 17:00:05
+[RiskManagement][2026.11.19 17:00:11][INFO][ACCOUNT_COLLECTION_SUCCESS] Account collection recovered after 5 failed cycle(s)
+--- C: network drop during 4 cycles ---
+[RiskManagement][2026.11.19 17:00:12][WARNING][TERMINAL_DISCONNECTED] Terminal lost the connection to the trade server
+[RiskManagement][2026.11.19 17:00:12][WARNING][ACCOUNT_COLLECTION_FAILED] No valid account snapshot: status=UNAVAILABLE reason=TERMINAL_DISCONNECTED: terminal is not connected to the trade server (InpRequireConnectedTerminal=true) consecutive_failed_cycles=1 last_successful_collection=2026.11.19 17:00:11
+[RiskManagement][2026.11.19 17:00:16][INFO][TERMINAL_RECONNECTED] Terminal reconnected to the trade server after about 4 s
+[RiskManagement][2026.11.19 17:00:16][INFO][ACCOUNT_COLLECTION_SUCCESS] Account collection recovered after 4 failed cycle(s)
+--- D: account identity changes without an EA reload ---
+[RiskManagement][2026.11.19 17:00:17][ERROR][ACCOUNT_IDENTITY_CHANGED] ACCOUNT_IDENTITY_CHANGED: baseline login=12345678 server="Exness-MT5Real8" currency="USD" but the terminal now reports login=87654321 server="Exness-MT5Real8" currency="USD". Account context locked: no further collection; restart the EA to monitor the new account
+[RiskManagement][2026.11.19 17:00:19][INFO][EA_SHUTDOWN] RiskManagement M1 stopped, reason=REMOVE (1)
+--- E: InpEnableDebugLogging=true (one detail line per successful cycle) ---
+[RiskManagement][2026.11.19 17:00:19][INFO][ACCOUNT_COLLECTION_SUCCESS] First valid account snapshot; identity baseline locked: login=12345678 server="Exness-MT5Real8" currency="USD" company="Exness Technologies Ltd"
+[RiskManagement][2026.11.19 17:00:19][DEBUG][ACCOUNT_COLLECTION_SUCCESS] cycle=1 status=VALID login=12345678 server="Exness-MT5Real8" currency="USD" company="Exness Technologies Ltd" balance=1000.00 equity=1013.75 profit=12.50 credit=25.00 margin=50.00 free_margin=960.00 margin_level=2027.25 leverage=500 margin_mode=RETAIL_HEDGING trade_allowed=true expert_allowed=true server_time=2026.11.19 10:00:19 collection_time=2026.11.19 17:00:19
+[RiskManagement][2026.11.19 17:00:19][INFO][EA_INITIALIZED] RiskManagement M1 initialized (strict read-only). refresh_seconds=1 logging=true debug_logging=true require_connected_terminal=true. Account: login=12345678 server="Exness-MT5Real8" currency="USD" company="Exness Technologies Ltd"
+[RiskManagement][2026.11.19 17:00:20][DEBUG][ACCOUNT_COLLECTION_SUCCESS] cycle=2 status=VALID login=12345678 server="Exness-MT5Real8" currency="USD" company="Exness Technologies Ltd" balance=1000.00 equity=1013.75 profit=12.50 credit=25.00 margin=50.00 free_margin=960.00 margin_level=2027.25 leverage=500 margin_mode=RETAIL_HEDGING trade_allowed=true expert_allowed=true server_time=2026.11.19 10:00:20 collection_time=2026.11.19 17:00:20
+[RiskManagement][2026.11.19 17:00:20][INFO][EA_SHUTDOWN] RiskManagement M1 stopped, reason=REMOVE (1)
+--- F: invalid input InpAccountRefreshSeconds=0 ---
+[RiskManagement][2026.11.19 17:00:20][ERROR][EA_INITIALIZATION_FAILED] Invalid input: InpAccountRefreshSeconds must be >= 1 second(s) (got 0); no default value is substituted
+OnInit returned 32767 (INIT_PARAMETERS_INCORRECT)
+[RiskManagement][2026.11.19 17:00:20][INFO][EA_SHUTDOWN] RiskManagement M1 stopped, reason=INITFAILED (8)

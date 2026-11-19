@@ -1,0 +1,21 @@
+mutation check 2026-11-19 23:41:29 UTC
+M01 KILLED by: E08 F020 T08  - negative margin accepted
+M02 KILLED by: F021 F028 F029 T06  - NaN/Inf accepted
+M03 KILLED by: E02 E09 F006 F021 F028 F029 T16  - equity derived from balance + profit
+M04 KILLED by: E09 F010 F021  - free margin derived
+M05 KILLED by: T02 T04  - snapshot not reset before/after collection
+M06 KILLED by: E06 F017 T15 T17  - disconnect ignored
+M07 KILLED by: E11  - local time used as server time
+M08 KILLED by: E08 E11 E13 F017 F029 T10  - repeated failures logged every cycle
+M09 KILLED by: E12 F019  - identity change not latched
+M10 KILLED by: F017 F019 F028  - historical copy presented as VALID
+M11 KILLED by: F017 F019 F028 T10  - GetLatestSnapshot true for stale data
+M12 KILLED by: E10 T10  - disconnected data published as VALID
+M13 KILLED by: E08 F029 T12  - ERROR suppressed when logging is disabled
+M14 KILLED by: E03 E04 E05  - EventKillTimer called without a timer
+M15 KILLED by: E03 E08  - invalid refresh interval accepted
+M16 KILLED by: E08 F002 F003 F004 F012 F013 F020 F021 F028 F029 T11  - invalid data published
+M17 KILLED by: F002 T06 T11  - login 0 accepted
+M18 KILLED by: E04  - core not shut down after timer failure
+M19 KILLED by: E04  - timer failure reported as success
+surviving or unapplied mutations: 0
