@@ -1,0 +1,3 @@
+Tests/host/build/
+Tests/host/build_mutation/
+*.ex5
