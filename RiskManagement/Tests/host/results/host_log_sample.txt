@@ -25,3 +25,87 @@
 [RiskManagement][2026.11.19 17:00:20][ERROR][EA_INITIALIZATION_FAILED] Invalid input: InpAccountRefreshSeconds must be >= 1 second(s) (got 0); no default value is substituted
 OnInit returned 32767 (INIT_PARAMETERS_INCORRECT)
 [RiskManagement][2026.11.19 17:00:20][INFO][EA_SHUTDOWN] RiskManagement M1 stopped, reason=INITFAILED (8)
+
+=== G: Telegram messages (text of each sendMessage request, JSON unescaped) ===
+----- message -----
+[RiskManagement] ✅ EA đã khởi động (chỉ đọc, không giao dịch)
+Tài khoản: 12345678 (Exness-MT5Real8, USD)
+Thời gian: 2026.11.19 17:00:00
+Chu kỳ làm mới: 1 giây
+Balance: 1000.00 USD
+Equity: 1013.75 USD
+Lãi/lỗ đang mở: 12.50 USD
+Credit: 25.00 USD
+Margin đang dùng: 50.00 USD
+Free Margin: 960.00 USD
+Margin Level: 2027.25%
+Đòn bẩy: 1:500
+----- message -----
+[RiskManagement] ⚠️ Terminal mất kết nối tới máy chủ giao dịch
+Tài khoản: 12345678 (Exness-MT5Real8, USD)
+Thời gian: 2026.11.19 17:00:02
+Dữ liệu tài khoản tạm thời không cập nhật được.
+----- message -----
+[RiskManagement] ✅ Terminal đã kết nối lại
+Tài khoản: 12345678 (Exness-MT5Real8, USD)
+Thời gian: 2026.11.19 17:00:03
+Thời gian mất kết nối: khoảng 1 giây
+
+[RiskManagement] ✅ Dữ liệu tài khoản đã hoạt động lại
+Tài khoản: 12345678 (Exness-MT5Real8, USD)
+Thời gian: 2026.11.19 17:00:03
+Sau 1 chu kỳ không có dữ liệu hợp lệ.
+Balance: 1000.00 USD
+Equity: 1013.75 USD
+Lãi/lỗ đang mở: 12.50 USD
+Credit: 25.00 USD
+Margin đang dùng: 50.00 USD
+Free Margin: 960.00 USD
+Margin Level: 2027.25%
+Đòn bẩy: 1:500
+----- message -----
+[RiskManagement] ❌ Dữ liệu tài khoản có vấn đề
+Tài khoản: 12345678 (Exness-MT5Real8, USD)
+Thời gian: 2026.11.19 17:01:38
+Trạng thái: Không hợp lệ
+Lý do: Dữ liệu không hợp lệ: Margin bị âm
+Lần có dữ liệu hợp lệ gần nhất: 2026.11.19 17:01:37
+EA vẫn tiếp tục thử lại và sẽ báo khi dữ liệu hoạt động lại.
+----- message -----
+[RiskManagement] ✅ Dữ liệu tài khoản đã hoạt động lại
+Tài khoản: 12345678 (Exness-MT5Real8, USD)
+Thời gian: 2026.11.19 17:01:39
+Sau 1 chu kỳ không có dữ liệu hợp lệ.
+Balance: 1000.00 USD
+Equity: 1013.75 USD
+Lãi/lỗ đang mở: 12.50 USD
+Credit: 25.00 USD
+Margin đang dùng: 50.00 USD
+Free Margin: 960.00 USD
+Margin Level: 2027.25%
+Đòn bẩy: 1:500
+----- message -----
+[RiskManagement] ℹ️ Tóm tắt tài khoản
+Tài khoản: 12345678 (Exness-MT5Real8, USD)
+Thời gian: 2026.11.19 18:01:40
+Balance: 1000.00 USD
+Equity: 1013.75 USD
+Lãi/lỗ đang mở: 12.50 USD
+Credit: 25.00 USD
+Margin đang dùng: 50.00 USD
+Free Margin: 960.00 USD
+Margin Level: 2027.25%
+Đòn bẩy: 1:500
+----- message -----
+[RiskManagement] ❌ Phát hiện tài khoản đã thay đổi
+Tài khoản: 12345678 (Exness-MT5Real8, USD)
+Thời gian: 2026.11.19 18:01:41
+Tài khoản ban đầu: 12345678 (Exness-MT5Real8, USD)
+Terminal hiện báo: 87654321 (Exness-MT5Real8, USD)
+EA đã ngừng thu thập dữ liệu để không trộn lẫn hai tài khoản.
+Hãy gỡ EA khỏi chart và gắn lại để theo dõi tài khoản mới.
+----- message -----
+[RiskManagement] ℹ️ EA đã dừng
+Tài khoản: 12345678 (Exness-MT5Real8, USD)
+Thời gian: 2026.11.19 18:01:41
+Lý do: EA bị gỡ khỏi chart

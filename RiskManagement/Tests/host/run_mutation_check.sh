@@ -36,6 +36,13 @@ MUTATIONS=(
 "M17|Include/Validation/DataValidator.mqh|s/if\(snapshot.login<=0\)/if(snapshot.login<0)/|login 0 accepted"
 "M18|RiskManagement.mq5|/if\(!EventSetTimer/,/return\(INIT_FAILED\)/ s/g_core.Shutdown\(\);/\/\/ shutdown removed/|core not shut down after timer failure"
 "M19|RiskManagement.mq5|/if\(!EventSetTimer/,/return\(INIT_FAILED\)/ s/return\(INIT_FAILED\);/return(INIT_SUCCEEDED);/|timer failure reported as success"
+"M20|Include/Notify/TelegramNotifier.mqh|s/m_next_attempt=now\+wait;/m_next_attempt=0;/|Telegram 429 retry_after ignored"
+"M21|Include/Notify/TelegramNotifier.mqh|s/m_disabled=true;/m_disabled=false;/|Telegram keeps sending after HTTP 401"
+"M22|Include/Notify/TelegramNotifier.mqh|s/if\(m_in_error \&\& key==m_error_key\)/if(false)/|Telegram failure logged every attempt"
+"M23|Include/Notify/HttpTransport.mqh|s/ArrayResize\(body,copied-1\);/ArrayResize(body,copied);/|terminating zero sent in the JSON body"
+"M24|Include/Notify/TelegramNotifier.mqh|s/if\(m_startup_mode \&\& !lifecycle\)/if(false)/|duplicate notifications at start"
+"M25|Include/Notify/TelegramNotifier.mqh|s/\+RMJsonEscape\(text\)\+/+text+/|message text not JSON-escaped"
+"M26|Include/Notify/TelegramNotifier.mqh|s/m_backoff_seconds=m_backoff_seconds\*2;/m_backoff_seconds=m_backoff_seconds;/|no exponential back-off"
 )
 
 survivors=0

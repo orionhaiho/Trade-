@@ -33,6 +33,37 @@ void Begin(const std::string &name)
    InpEnableLogging = true;
    InpEnableDebugLogging = false;
    InpRequireConnectedTerminal = true;
+   InpTelegramEnable = false;
+   InpTelegramBotToken = "";
+   InpTelegramChatId = "";
+   InpTelegramSummaryMinutes = 0;
+   InpTelegramTimeoutMs = 5000;
+}
+
+const std::string kToken = "123456789:TESTtokenTESTtokenTESTtoken_-0123";
+
+void EnableTelegram()
+{
+   InpTelegramEnable = true;
+   InpTelegramBotToken = kToken;
+   InpTelegramChatId = "123456789";
+}
+
+int CountRequestsContaining(const std::string &needle)
+{
+   int count = 0;
+   for (const ShimWebRequestRecord &request : g_shim.web_requests)
+      if (request.body.find(needle) != std::string::npos)
+         count++;
+   return count;
+}
+
+bool LogContains(const std::string &needle)
+{
+   for (const std::string &line : g_shim.printed)
+      if (line.find(needle) != std::string::npos)
+         return true;
+   return false;
 }
 
 void Expect(bool condition, const std::string &what)
@@ -316,6 +347,137 @@ int main()
       Timers(1);
       Expect(g_core.GetCurrentStatus() == DATA_STATUS_VALID, "VALID once the error clears");
       Expect(CountLines("First valid account snapshot") == 1, "first valid snapshot logged");
+      OnDeinit(REASON_REMOVE);
+   }
+   End();
+
+
+   // E14 ---------------------------------------------------------------
+   Begin("E14 Telegram: start message sent by WebRequest, in Vietnamese, after the first refresh");
+   {
+      EnableTelegram();
+      Expect(OnInit() == INIT_SUCCEEDED, "OnInit succeeds");
+      Expect(g_shim.web_requests.empty(), "no network call inside OnInit");
+      Timers(1);
+      Expect(g_shim.web_requests.size() == 1, "one request on the first timer cycle");
+      if (!g_shim.web_requests.empty())
+      {
+         const ShimWebRequestRecord &request = g_shim.web_requests[0];
+         Expect(request.method == "POST", "POST");
+         Expect(request.url == "https://api.telegram.org/bot" + kToken + "/sendMessage", "sendMessage URL");
+         Expect(request.headers.find("Content-Type: application/json") != std::string::npos, "JSON content type");
+         Expect(request.timeout == 5000, "InpTelegramTimeoutMs used");
+         Expect(request.body.find("\"chat_id\":\"123456789\"") != std::string::npos, "chat id");
+         Expect(request.body.find("EA đã khởi động") != std::string::npos, "Vietnamese UTF-8 start message");
+         Expect(request.body.find("Balance: 1000.00 USD") != std::string::npos, "account values");
+         Expect(request.body.find("Đã nhận dữ liệu tài khoản hợp lệ") == std::string::npos, "initial collection summarised by the start message (no duplicate)");
+         Expect(request.body.back() == '}', "no terminating zero sent");
+      }
+      Timers(5);
+      Expect(g_shim.web_requests.size() == 1, "nothing more while nothing changes");
+      Expect(!LogContains(kToken), "token never logged");
+      OnDeinit(REASON_REMOVE);
+   }
+   End();
+
+   // E15 ---------------------------------------------------------------
+   Begin("E15 Telegram: invalid token -> OnInit rejected, token not logged, no request");
+   {
+      EnableTelegram();
+      InpTelegramBotToken = "123456789:" + std::string("short");
+      Expect(OnInit() == INIT_PARAMETERS_INCORRECT, "INIT_PARAMETERS_INCORRECT");
+      Expect(CountLines("[ERROR][EA_INITIALIZATION_FAILED] Invalid input: InpTelegramBotToken") == 1, "reason logged");
+      Expect(!LogContains("short"), "token text not logged");
+      OnDeinit(REASON_INITFAILED);
+      Expect(g_shim.web_requests.empty(), "no request");
+   }
+   End();
+
+   // E16 ---------------------------------------------------------------
+   Begin("E16 Telegram: WebRequest not allowed (4014) -> monitoring unaffected, one ERROR, retried");
+   {
+      EnableTelegram();
+      g_shim.web_status = -1;
+      g_shim.web_error = 4014;
+      Expect(OnInit() == INIT_SUCCEEDED, "OnInit succeeds");
+      Timers(3);
+      Expect(g_core.GetCurrentStatus() == DATA_STATUS_VALID, "account monitoring still VALID");
+      Expect(g_shim.web_requests.size() == 1, "one attempt, then back-off");
+      Expect(CountLines("[ERROR][TELEGRAM_SEND_FAILED] WebRequest is not allowed (error 4014)") == 1, "fix explained once");
+      g_shim.local_time += 10;
+      Timers(1);
+      Expect(g_shim.web_requests.size() == 2, "retried after 10 s");
+      g_shim.web_status = 200;
+      g_shim.local_time += 20;
+      Timers(1);
+      Expect(CountLines("[INFO][TELEGRAM_SEND_RECOVERED]") == 1, "recovery logged");
+      Expect(!LogContains(kToken), "token never logged");
+      OnDeinit(REASON_REMOVE);
+   }
+   End();
+
+   // E17 ---------------------------------------------------------------
+   Begin("E17 Telegram: stop message flushed in OnDeinit with a short timeout");
+   {
+      EnableTelegram();
+      InpTelegramTimeoutMs = 8000;
+      Expect(OnInit() == INIT_SUCCEEDED, "OnInit succeeds");
+      Timers(1);
+      std::size_t before = g_shim.web_requests.size();
+      OnDeinit(REASON_REMOVE);
+      Expect(g_shim.web_requests.size() == before + 1, "one request in OnDeinit");
+      Expect(CountRequestsContaining("EA đã dừng") == 1 && CountRequestsContaining("EA bị gỡ khỏi chart") == 1, "Vietnamese stop reason");
+      Expect(g_shim.web_requests.back().timeout == 3000, "flush timeout capped at 3000 ms");
+   }
+   End();
+
+   // E18 ---------------------------------------------------------------
+   Begin("E18 Telegram disabled (default): no network call in the whole lifecycle");
+   {
+      Expect(OnInit() == INIT_SUCCEEDED, "OnInit succeeds");
+      g_shim.connected = false;
+      Timers(3);
+      g_shim.connected = true;
+      Timers(3);
+      OnDeinit(REASON_REMOVE);
+      Expect(g_shim.web_requests.empty(), "no WebRequest");
+   }
+   End();
+
+   // E19 ---------------------------------------------------------------
+   Begin("E19 Telegram: invalid refresh input is still reported to Telegram");
+   {
+      EnableTelegram();
+      InpAccountRefreshSeconds = 0;
+      Expect(OnInit() == INIT_PARAMETERS_INCORRECT, "rejected");
+      OnDeinit(REASON_INITFAILED);
+      Expect(g_shim.web_requests.size() == 1, "one request at OnDeinit");
+      Expect(CountRequestsContaining("EA khởi động thất bại") == 1, "failure message in Vietnamese");
+      Expect(CountRequestsContaining("InpAccountRefreshSeconds") == 1, "reason included");
+   }
+   End();
+
+   // E20 ---------------------------------------------------------------
+   Begin("E20 Telegram: disconnect/reconnect messages and periodic summary");
+   {
+      EnableTelegram();
+      InpTelegramSummaryMinutes = 1;
+      Expect(OnInit() == INIT_SUCCEEDED, "OnInit succeeds");
+      Timers(1);
+      g_shim.connected = false;
+      g_shim.local_time += 1;
+      Timers(1);
+      Expect(CountRequestsContaining("Terminal mất kết nối tới máy chủ giao dịch") == 1, "disconnect message");
+      g_shim.connected = true;
+      g_shim.local_time += 4;
+      Timers(1);
+      Expect(CountRequestsContaining("Terminal đã kết nối lại") == 1, "reconnect message");
+      Expect(CountRequestsContaining("khoảng 4 giây") == 1, "outage duration in Vietnamese");
+      g_shim.local_time += 60;
+      Timers(1);
+      Expect(CountRequestsContaining("Tóm tắt tài khoản") == 1, "summary after 1 minute");
+      Timers(3);
+      Expect(CountRequestsContaining("Tóm tắt tài khoản") == 1, "no extra summary within the interval");
       OnDeinit(REASON_REMOVE);
    }
    End();

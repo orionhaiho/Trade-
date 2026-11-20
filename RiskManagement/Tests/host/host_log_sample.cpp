@@ -54,5 +54,48 @@ int main()
    int result = OnInit();
    std::cout << "OnInit returned " << result << " (INIT_PARAMETERS_INCORRECT)\n";
    OnDeinit(REASON_INITFAILED);
+
+   std::cout << "\n=== G: Telegram messages (text of each sendMessage request, JSON unescaped) ===\n";
+   g_shim = ShimTerminalState();
+   g_shim.echo = false;
+   InpAccountRefreshSeconds = 1;
+   InpTelegramEnable = true;
+   InpTelegramBotToken = "123456789:TESTtokenTESTtokenTESTtoken_-0123";
+   InpTelegramChatId = "123456789";
+   InpTelegramSummaryMinutes = 60;
+   OnInit();
+   Timers(1);
+   g_shim.connected = false;
+   Timers(1);
+   g_shim.connected = true;
+   Timers(95);
+   g_shim.margin = -1.0;
+   Timers(1);
+   g_shim.margin = 50.0;
+   Timers(1);
+   g_shim.local_time += 3600;
+   Timers(1);
+   g_shim.login = 87654321;
+   Timers(1);
+   OnDeinit(REASON_REMOVE);
+   for (const ShimWebRequestRecord &request : g_shim.web_requests)
+   {
+      std::string body = request.body;
+      std::size_t start = body.find("\"text\":\"") + 8;
+      std::size_t end = body.find("\",\"disable_web_page_preview\"");
+      std::string text = body.substr(start, end - start);
+      std::string out;
+      for (std::size_t i = 0; i < text.size(); i++)
+      {
+         if (text[i] == '\\' && i + 1 < text.size())
+         {
+            char next = text[++i];
+            out += (next == 'n') ? '\n' : next;
+         }
+         else
+            out += text[i];
+      }
+      std::cout << "----- message -----\n" << out << '\n';
+   }
    return 0;
 }

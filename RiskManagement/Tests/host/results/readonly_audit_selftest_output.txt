@@ -15,5 +15,8 @@ V13 DETECTED - call outside the whitelist -> call to a function outside the read
 V14 DETECTED - DLL import -> #import (DLL / external library) present
 V15 DETECTED - dynamic allocation -> dynamic allocation keyword: new
 V16 DETECTED - trade call in an unused helper -> forbidden identifier in code: PositionModify; call to a function outside the read-only whitelist: PositionModify
-V17 DETECTED - network request -> forbidden identifier in code: WebRequest; call to a function outside the read-only whitelist: WebRequest
-missed: 0 of 17
+V17 DETECTED - network request outside the transport -> WebRequest called outside CWebRequestTransport; URL other than https://api.telegram.org in a string literal: https://example.invalid
+V18 DETECTED - URL to another host -> URL other than https://api.telegram.org in a string literal: https://example.invalid
+V19 DETECTED - WebRequest in the notifier instead of the transport -> call to a function outside the read-only whitelist: ResetQueue; WebRequest called outside CWebRequestTransport; call to a function outside the read-only whitelist: ResetQueue
+V20 DETECTED - push notification API -> forbidden identifier in code: SendNotification; call to a function outside the read-only whitelist: ResetQueue; call to a function outside the read-only whitelist: SendNotification
+missed: 0 of 20

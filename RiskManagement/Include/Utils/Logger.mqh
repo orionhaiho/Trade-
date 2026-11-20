@@ -4,7 +4,7 @@
 //|                                                                  |
 //| Controlled logging to the Experts/Journal tab (Print only).      |
 //|   - levels: DEBUG, INFO, WARNING, ERROR                          |
-//|   - the 8 mandatory event codes, as a closed enum                |
+//|   - the 8 mandatory event codes (+2 Telegram add-on codes)        |
 //|   - every line carries a local timestamp, level and event code   |
 //|                                                                  |
 //| Level policy (user decision Q-03):                               |
@@ -41,10 +41,13 @@ enum ENUM_RM_LOG_EVENT
    RM_EVENT_ACCOUNT_IDENTITY_CHANGED,
    RM_EVENT_TERMINAL_DISCONNECTED,
    RM_EVENT_TERMINAL_RECONNECTED,
-   RM_EVENT_EA_SHUTDOWN
+   RM_EVENT_EA_SHUTDOWN,
+   //--- Telegram add-on (not part of the 8 mandatory M1 codes)
+   RM_EVENT_TELEGRAM_SEND_FAILED,
+   RM_EVENT_TELEGRAM_SEND_RECOVERED
   };
 
-#define RM_LOG_EVENT_COUNT 8
+#define RM_LOG_EVENT_COUNT 10
 
 //--- exact event code text written to the log
 string RMLogEventCode(const ENUM_RM_LOG_EVENT event_id)
@@ -67,6 +70,10 @@ string RMLogEventCode(const ENUM_RM_LOG_EVENT event_id)
          return("TERMINAL_RECONNECTED");
       case RM_EVENT_EA_SHUTDOWN:
          return("EA_SHUTDOWN");
+      case RM_EVENT_TELEGRAM_SEND_FAILED:
+         return("TELEGRAM_SEND_FAILED");
+      case RM_EVENT_TELEGRAM_SEND_RECOVERED:
+         return("TELEGRAM_SEND_RECOVERED");
      }
    return("UNKNOWN_EVENT");
   }

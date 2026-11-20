@@ -12,6 +12,8 @@
 //| Results are printed to the Experts tab as "[RM-TEST] ..." lines; |
 //| the harness then removes itself (ExpertRemove).                  |
 //|                                                                  |
+//| N01-N14 test the Telegram add-on with a fake HTTP transport (no  |
+//| network request is made).                                        |
 //| Not covered here: F026 (EventSetTimer failure cannot be forced   |
 //| inside MT5) and F030 (static read-only audit, see Tools/).       |
 //+------------------------------------------------------------------+
@@ -24,6 +26,7 @@
 #include "../Include/Validation/DataValidator.mqh"
 #include "../Include/Core/AccountEngine.mqh"
 #include "../Include/Core/CoreEngine.mqh"
+#include "../Include/Notify/TelegramNotifier.mqh"
 
 #define RM_TEST_SERVER_TIME  ((datetime)1795082400)   // 2026.11.19 10:00:00 simulated trade server time
 #define RM_TEST_LOCAL_TIME   ((datetime)1795107600)   // 2026.11.19 17:00:00 simulated local time (differs on purpose)
@@ -238,6 +241,59 @@ public:
   };
 
 //+------------------------------------------------------------------+
+//| Controlled HTTP test double (no network)                         |
+//+------------------------------------------------------------------+
+class CFakeHttpTransport : public CHttpTransport
+  {
+public:
+   int               status_to_return;
+   int               error_to_return;
+   string            response_to_return;
+   int               calls;
+   string            last_url;
+   string            last_body;
+   int               last_timeout;
+
+                     CFakeHttpTransport()
+     {
+      SetOk();
+      calls=0;
+      last_url="";
+      last_body="";
+      last_timeout=0;
+     }
+
+   void              SetOk()
+     {
+      status_to_return=200;
+      error_to_return=0;
+      response_to_return="{\"ok\":true,\"result\":{\"message_id\":1}}";
+     }
+
+   void              SetResult(const int status,const int error_code,const string response)
+     {
+      status_to_return=status;
+      error_to_return=error_code;
+      response_to_return=response;
+     }
+
+   virtual int       PostJson(const string url,const string json_body,const int timeout_ms,
+                              string &response_body,int &error_code)
+     {
+      calls++;
+      last_url=url;
+      last_body=json_body;
+      last_timeout=timeout_ms;
+      response_body=response_to_return;
+      error_code=error_to_return;
+      return(status_to_return);
+     }
+  };
+
+#define RM_TEST_TOKEN   "123456789:TESTtokenTESTtokenTESTtoken_-0123"
+#define RM_TEST_CHAT_ID "123456789"
+
+//+------------------------------------------------------------------+
 //| Core engine wired to the test double and a silent logger         |
 //+------------------------------------------------------------------+
 class CTestFixture
@@ -272,6 +328,29 @@ public:
      {
       for(int i=0; i<cycles; i++)
          core.Refresh();
+     }
+  };
+
+//+------------------------------------------------------------------+
+//| Telegram notifier wired to the fake transport (optionally to a   |
+//| core engine fixture)                                             |
+//+------------------------------------------------------------------+
+class CTelegramFixture
+  {
+public:
+   CFakeHttpTransport transport;
+   CLogger           logger;
+   CTelegramNotifier notifier;
+
+   bool              Setup()
+     {
+      logger.Configure(true,false);
+      logger.SetSilent(true);
+      logger.ResetCounters();
+      notifier.SetTransport(GetPointer(transport));
+      if(!notifier.Configure(true,RM_TEST_TOKEN,RM_TEST_CHAT_ID,4000,GetPointer(logger)))
+         return(false);
+      return(notifier.Initialize());
      }
   };
 
@@ -1321,6 +1400,8 @@ void Test_T12()
    Check(RMLogEventCode(RM_EVENT_TERMINAL_DISCONNECTED)=="TERMINAL_DISCONNECTED","TERMINAL_DISCONNECTED");
    Check(RMLogEventCode(RM_EVENT_TERMINAL_RECONNECTED)=="TERMINAL_RECONNECTED","TERMINAL_RECONNECTED");
    Check(RMLogEventCode(RM_EVENT_EA_SHUTDOWN)=="EA_SHUTDOWN","EA_SHUTDOWN");
+   Check(RMLogEventCode(RM_EVENT_TELEGRAM_SEND_FAILED)=="TELEGRAM_SEND_FAILED","TELEGRAM_SEND_FAILED");
+   Check(RMLogEventCode(RM_EVENT_TELEGRAM_SEND_RECOVERED)=="TELEGRAM_SEND_RECOVERED","TELEGRAM_SEND_RECOVERED");
    TestEnd();
   }
 
@@ -1423,6 +1504,269 @@ void Test_T18()
    TestEnd();
   }
 
+
+//+------------------------------------------------------------------+
+//| Telegram add-on N01 - N14 (fake transport, no network)           |
+//+------------------------------------------------------------------+
+void Test_N01()
+  {
+   TestBegin("N01","Vietnamese text file decoded as UTF-8 (encoding probe U+1EA1)");
+   string probe=RMViEncodingProbe();
+   Check(StringLen(probe)==1,"probe is one character (file read as UTF-8)");
+   Check(StringGetCharacter(probe,0)==0x1EA1,"probe is U+1EA1");
+   TestEnd();
+  }
+
+void Test_N02()
+  {
+   TestBegin("N02","Telegram input validation (rejects, never substitutes)");
+   string error_message="";
+   Check(RMValidateTelegramInputs(false,"","",0,0,error_message),"disabled: other Telegram inputs ignored");
+   Check(RMValidateTelegramInputs(true,RM_TEST_TOKEN,RM_TEST_CHAT_ID,0,5000,error_message),"valid token + numeric chat id");
+   Check(RMValidateTelegramInputs(true,RM_TEST_TOKEN,"-1001234567890",60,5000,error_message),"group chat id accepted");
+   Check(RMValidateTelegramInputs(true,RM_TEST_TOKEN,"@my_channel",60,5000,error_message),"channel username accepted");
+   Check(!RMValidateTelegramInputs(true,"",RM_TEST_CHAT_ID,0,5000,error_message),"empty token rejected");
+   Check(StringFind(error_message,"InpTelegramBotToken")>=0,"message names InpTelegramBotToken");
+   Check(!RMValidateTelegramInputs(true,"123:short",RM_TEST_CHAT_ID,0,5000,error_message),"short token rejected");
+   Check(!RMValidateTelegramInputs(true,"123456789:TESTtoken TESTtokenTESTtoken_-0123",RM_TEST_CHAT_ID,0,5000,error_message),"token with a space rejected");
+   Check(!RMValidateTelegramInputs(true,"abc:TESTtokenTESTtokenTESTtoken_-0123",RM_TEST_CHAT_ID,0,5000,error_message),"non-numeric bot id rejected");
+   Check(!RMValidateTelegramInputs(true,RM_TEST_TOKEN,"",0,5000,error_message),"empty chat id rejected");
+   Check(!RMValidateTelegramInputs(true,RM_TEST_TOKEN,"12a",0,5000,error_message),"malformed chat id rejected");
+   Check(!RMValidateTelegramInputs(true,RM_TEST_TOKEN,"@ab",0,5000,error_message),"too short channel name rejected");
+   Check(!RMValidateTelegramInputs(true,RM_TEST_TOKEN,RM_TEST_CHAT_ID,-1,5000,error_message),"negative summary interval rejected");
+   Check(!RMValidateTelegramInputs(true,RM_TEST_TOKEN,RM_TEST_CHAT_ID,0,500,error_message),"timeout below 1000 ms rejected");
+   Check(!RMValidateTelegramInputs(true,RM_TEST_TOKEN,RM_TEST_CHAT_ID,0,20000,error_message),"timeout above 15000 ms rejected");
+   Check(StringFind(error_message,RM_TEST_TOKEN)<0,"validation messages never contain the token");
+   TestEnd();
+  }
+
+void Test_N03()
+  {
+   TestBegin("N03","Core event -> one Vietnamese Telegram message (URL, chat id, JSON)");
+   CTestFixture fx;
+   CTelegramFixture tg;
+   Check(tg.Setup(),"notifier initialized");
+   Check(fx.Setup(true,true,false),"core setup");
+   fx.core.SetEventListener(GetPointer(tg.notifier));
+   fx.core.Refresh();
+   tg.notifier.Process(RM_TEST_LOCAL_TIME);
+   Check(tg.transport.calls==1,"first valid snapshot sent");
+   string expected_url="https://api.telegram.org/bot";
+   expected_url=expected_url+RM_TEST_TOKEN+"/sendMessage";
+   Check(tg.transport.last_url==expected_url,"sendMessage URL");
+   Check(StringFind(tg.transport.last_body,"\"chat_id\":\"123456789\"")>=0,"chat_id in the JSON body");
+   Check(StringFind(tg.transport.last_body,"Balance: 1000.00 USD")>=0,"account values in the message");
+   Check(tg.transport.last_timeout==4000,"configured timeout used");
+   fx.source.connected=false;
+   fx.core.Refresh();
+   tg.notifier.Process(RM_TEST_LOCAL_TIME);
+   Check(tg.transport.calls==2,"disconnect notification sent");
+   RiskEvent expected;
+   RiskEventReset(expected,RM_EVENT_TERMINAL_DISCONNECTED,RM_LOG_WARNING,RM_TEST_LOCAL_TIME);
+   string expected_text=RMJsonEscape(RMTelegramFormatEventVi(expected,"12345678 (Exness-MT5Real8, USD)"));
+   Check(StringFind(tg.transport.last_body,expected_text)>=0,"Vietnamese disconnect message with the account label");
+   Check(tg.notifier.GetQueueSize()==0,"queue empty after success");
+   TestEnd();
+  }
+
+void Test_N04()
+  {
+   TestBegin("N04","Only state transitions are sent (30 identical failed cycles -> 1 message)");
+   CTestFixture fx;
+   CTelegramFixture tg;
+   Check(tg.Setup(),"notifier initialized");
+   Check(fx.Setup(true,true,false),"core setup");
+   fx.core.SetEventListener(GetPointer(tg.notifier));
+   fx.core.Refresh();
+   tg.notifier.Process(RM_TEST_LOCAL_TIME);
+   int calls_before=tg.transport.calls;
+   fx.source.connected=false;
+   for(int i=0; i<30; i++)
+     {
+      fx.core.Refresh();
+      tg.notifier.Process(RM_TEST_LOCAL_TIME+i);
+     }
+   Check(tg.transport.calls==calls_before+1,"one request for 30 disconnected cycles");
+   Check(StringFind(tg.transport.last_body,"\\n\\n")<0,"a single message (the failure caused by the disconnect is not repeated)");
+   fx.source.connected=true;
+   fx.source.margin=-1.0;
+   fx.core.Refresh();
+   tg.notifier.Process(RM_TEST_LOCAL_TIME+100);
+   Check(StringFind(tg.transport.last_body,RMViValidationErrors("ACCOUNT_MARGIN must be >= 0"))>=0,"a data failure is still sent");
+   TestEnd();
+  }
+
+void Test_N05()
+  {
+   TestBegin("N05","Queued messages are batched into one request");
+   CTelegramFixture tg;
+   Check(tg.Setup(),"notifier initialized");
+   tg.notifier.Enqueue("first");
+   tg.notifier.Enqueue("second");
+   tg.notifier.Enqueue("third");
+   tg.notifier.Process(RM_TEST_LOCAL_TIME);
+   Check(tg.transport.calls==1,"one request");
+   Check(StringFind(tg.transport.last_body,"first\\n\\nsecond\\n\\nthird")>=0,"all three messages, in order");
+   Check(tg.notifier.GetQueueSize()==0,"queue empty");
+   TestEnd();
+  }
+
+void Test_N06()
+  {
+   TestBegin("N06","Network failure: messages kept, exponential back-off, logged once, recovery logged");
+   CTelegramFixture tg;
+   Check(tg.Setup(),"notifier initialized");
+   tg.transport.SetResult(-1,5202,"");
+   tg.notifier.Enqueue("message");
+   datetime now=RM_TEST_LOCAL_TIME;
+   tg.notifier.Process(now);
+   Check(tg.notifier.GetQueueSize()==1,"message kept after the failure");
+   Check(tg.notifier.GetNextAttemptTime()==now+10,"first retry after 10 s");
+   tg.notifier.Process(now+5);
+   Check(tg.transport.calls==1,"no request during the back-off");
+   tg.notifier.Process(now+10);
+   Check(tg.transport.calls==2,"retry after the back-off");
+   Check(tg.notifier.GetNextAttemptTime()==now+30,"second back-off doubled to 20 s");
+   Check(tg.logger.GetEventCount(RM_EVENT_TELEGRAM_SEND_FAILED)==1,"same failure logged once");
+   tg.transport.SetOk();
+   tg.notifier.Process(now+30);
+   Check(tg.notifier.GetQueueSize()==0,"delivered after recovery");
+   Check(tg.logger.GetEventCount(RM_EVENT_TELEGRAM_SEND_RECOVERED)==1,"recovery logged once");
+   TestEnd();
+  }
+
+void Test_N07()
+  {
+   TestBegin("N07","HTTP 429 honours retry_after");
+   CTelegramFixture tg;
+   Check(tg.Setup(),"notifier initialized");
+   tg.transport.SetResult(429,0,"{\"ok\":false,\"error_code\":429,\"description\":\"Too Many Requests: retry after 7\",\"parameters\":{\"retry_after\":7}}");
+   tg.notifier.Enqueue("message");
+   tg.notifier.Process(RM_TEST_LOCAL_TIME);
+   Check(tg.notifier.GetNextAttemptTime()==RM_TEST_LOCAL_TIME+7,"next attempt after retry_after");
+   Check(tg.notifier.GetQueueSize()==1,"message kept");
+   Check(!tg.notifier.IsDisabled(),"not disabled");
+   TestEnd();
+  }
+
+void Test_N08()
+  {
+   TestBegin("N08","HTTP 401 (wrong token) disables Telegram; the token never appears in the log");
+   CTelegramFixture tg;
+   Check(tg.Setup(),"notifier initialized");
+   tg.transport.SetResult(401,0,"{\"ok\":false,\"error_code\":401,\"description\":\"Unauthorized\"}");
+   tg.notifier.Enqueue("message");
+   tg.notifier.Process(RM_TEST_LOCAL_TIME);
+   Check(tg.notifier.IsDisabled(),"disabled");
+   Check(!tg.notifier.IsActive(),"inactive");
+   Check(tg.logger.GetLevelCount(RM_LOG_ERROR)==1,"one ERROR line");
+   Check(StringFind(tg.logger.GetLastLine(),"InpTelegramBotToken")>=0,"hint names InpTelegramBotToken");
+   Check(StringFind(tg.logger.GetLastLine(),RM_TEST_TOKEN)<0,"token not logged");
+   tg.notifier.Process(RM_TEST_LOCAL_TIME+600);
+   Check(tg.transport.calls==1,"no further request");
+   TestEnd();
+  }
+
+void Test_N09()
+  {
+   TestBegin("N09","WebRequest not allowed (4014): ERROR with the fix, keeps retrying");
+   CTelegramFixture tg;
+   Check(tg.Setup(),"notifier initialized");
+   tg.transport.SetResult(-1,4014,"");
+   tg.notifier.Enqueue("message");
+   tg.notifier.Process(RM_TEST_LOCAL_TIME);
+   Check(tg.logger.GetLevelCount(RM_LOG_ERROR)==1,"ERROR logged");
+   Check(StringFind(tg.logger.GetLastLine(),"https://api.telegram.org")>=0,"log explains which URL to allow");
+   Check(StringFind(tg.logger.GetLastLine(),RM_TEST_TOKEN)<0,"token not logged");
+   Check(!tg.notifier.IsDisabled(),"not disabled (the user can add the URL)");
+   tg.notifier.Process(RM_TEST_LOCAL_TIME+10);
+   Check(tg.transport.calls==2,"retried after the back-off");
+   Check(tg.logger.GetLevelCount(RM_LOG_ERROR)==1,"still one ERROR line");
+   TestEnd();
+  }
+
+void Test_N10()
+  {
+   TestBegin("N10","Bounded queue: oldest messages dropped and reported");
+   CTelegramFixture tg;
+   Check(tg.Setup(),"notifier initialized");
+   for(int i=0; i<RM_TG_QUEUE_CAPACITY+5; i++)
+      tg.notifier.Enqueue("message "+IntegerToString(i));
+   Check(tg.notifier.GetQueueSize()==RM_TG_QUEUE_CAPACITY,"queue capped");
+   Check(tg.notifier.GetDroppedCount()==5,"5 dropped");
+   tg.notifier.Process(RM_TEST_LOCAL_TIME);
+   Check(StringFind(tg.transport.last_body,RMViDroppedNotice(5))>=0,"drop notice sent");
+   Check(StringFind(tg.transport.last_body,"message 5")>=0 && StringFind(tg.transport.last_body,"message 4\\n")<0,"oldest messages were the ones dropped");
+   TestEnd();
+  }
+
+void Test_N11()
+  {
+   TestBegin("N11","JSON escaping of quotes, backslashes and line breaks");
+   Check(RMJsonEscape("a\"b\\c\nd\te")=="a\\\"b\\\\c\\nd\\te","escaped");
+   TestEnd();
+  }
+
+void Test_N12()
+  {
+   TestBegin("N12","Startup mode: core events skipped, lifecycle events kept");
+   CTelegramFixture tg;
+   Check(tg.Setup(),"notifier initialized");
+   tg.notifier.SetStartupMode(true);
+   RiskEvent risk_event;
+   RiskEventReset(risk_event,RM_EVENT_TERMINAL_DISCONNECTED,RM_LOG_WARNING,RM_TEST_LOCAL_TIME);
+   tg.notifier.OnRiskEvent(risk_event);
+   Check(tg.notifier.GetQueueSize()==0,"core event skipped during startup");
+   RiskEventReset(risk_event,RM_EVENT_EA_INITIALIZED,RM_LOG_INFO,RM_TEST_LOCAL_TIME);
+   tg.notifier.OnRiskEvent(risk_event);
+   Check(tg.notifier.GetQueueSize()==1,"EA_INITIALIZED queued");
+   tg.notifier.SetStartupMode(false);
+   RiskEventReset(risk_event,RM_EVENT_TERMINAL_DISCONNECTED,RM_LOG_WARNING,RM_TEST_LOCAL_TIME);
+   tg.notifier.OnRiskEvent(risk_event);
+   Check(tg.notifier.GetQueueSize()==2,"core events queued after startup");
+   TestEnd();
+  }
+
+void Test_N13()
+  {
+   TestBegin("N13","Every event type produces a message; identity change names both accounts");
+   RiskEvent risk_event;
+   int empty_messages=0;
+   for(int id=0; id<8; id++)
+     {
+      RiskEventReset(risk_event,(ENUM_RM_LOG_EVENT)id,RM_LOG_INFO,RM_TEST_LOCAL_TIME);
+      if(StringLen(RMTelegramFormatEventVi(risk_event,""))==0)
+         empty_messages++;
+     }
+   Check(empty_messages==0,"all 8 events have a Vietnamese message");
+   RiskEventReset(risk_event,RM_EVENT_ACCOUNT_IDENTITY_CHANGED,RM_LOG_ERROR,RM_TEST_LOCAL_TIME);
+   MakeValidSnapshot(risk_event.snapshot);
+   risk_event.has_snapshot=true;
+   risk_event.observed_login=87654321;
+   risk_event.observed_server="Exness-MT5Trial";
+   risk_event.observed_currency="USD";
+   string text=RMTelegramFormatEventVi(risk_event,"");
+   Check(StringFind(text,"12345678 (Exness-MT5Real8, USD)")>=0,"original account named");
+   Check(StringFind(text,"87654321 (Exness-MT5Trial, USD)")>=0,"new account named");
+   RiskEventReset(risk_event,RM_EVENT_TELEGRAM_SEND_FAILED,RM_LOG_ERROR,RM_TEST_LOCAL_TIME);
+   Check(StringLen(RMTelegramFormatEventVi(risk_event,""))==0,"Telegram's own events are never sent to Telegram");
+   TestEnd();
+  }
+
+void Test_N14()
+  {
+   TestBegin("N14","Periodic summary: current values, or clearly marked old values");
+   AccountSnapshot snapshot;
+   MakeValidSnapshot(snapshot);
+   string current=RMTelegramFormatSummaryVi(snapshot,true,DATA_STATUS_VALID,"","12345678 (Exness-MT5Real8, USD)",RM_TEST_LOCAL_TIME);
+   Check(StringFind(current,"Equity: 1013.75 USD")>=0,"current values listed");
+   snapshot.data_status=DATA_STATUS_STALE;
+   string stale=RMTelegramFormatSummaryVi(snapshot,false,DATA_STATUS_UNAVAILABLE,"TERMINAL_DISCONNECTED: x","",RM_TEST_LOCAL_TIME+600);
+   Check(StringFind(stale,RMViStatus(DATA_STATUS_UNAVAILABLE))>=0,"current status shown");
+   Check(StringFind(stale,AccountModelFormatTime(RM_TEST_LOCAL_TIME))>=0,"time of the old values shown");
+   TestEnd();
+  }
+
 //+------------------------------------------------------------------+
 //| Runner                                                           |
 //+------------------------------------------------------------------+
@@ -1476,6 +1820,20 @@ void RunAllTests()
    Test_T16();
    Test_T17();
    Test_T18();
+   Test_N01();
+   Test_N02();
+   Test_N03();
+   Test_N04();
+   Test_N05();
+   Test_N06();
+   Test_N07();
+   Test_N08();
+   Test_N09();
+   Test_N10();
+   Test_N11();
+   Test_N12();
+   Test_N13();
+   Test_N14();
   }
 
 int OnInit()

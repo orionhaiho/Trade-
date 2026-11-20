@@ -10,7 +10,9 @@
 //|     from the LAST SUCCESSFUL snapshot (VALID cycles only)        |
 //|   - locks the account identity and detects identity changes      |
 //|   - tracks terminal connect / disconnect transitions             |
-//|   - logs state transitions only (no repeated lines)              |
+//|   - logs state transitions only (no repeated lines) and raises   |
+//|     the same transitions as RiskEvent to an optional listener    |
+//|     (Telegram add-on)                                            |
 //|                                                                  |
 //| Invariants                                                       |
 //|   I1 a failed cycle never overwrites the last successful         |
@@ -33,6 +35,7 @@
 #include "../Models/AccountModel.mqh"
 #include "../Validation/DataValidator.mqh"
 #include "../Utils/Logger.mqh"
+#include "../Models/RiskEvent.mqh"
 #include "AccountEngine.mqh"
 
 //+------------------------------------------------------------------+
@@ -78,6 +81,7 @@ private:
    CAccountEngine    m_account_engine;
    CDataValidator    m_validator;
    CLogger          *m_logger;
+   CRiskEventListener *m_listener;
    RiskManagementConfig m_config;
    bool              m_configured;
    bool              m_initialized;
@@ -88,6 +92,7 @@ private:
    ENUM_DATA_STATUS  m_current_status;
    string            m_current_error;
    long              m_cycle_count;
+   datetime          m_cycle_time;
 
    //--- last successful snapshot: updated ONLY by VALID cycles
    bool              m_has_last_success;
@@ -126,6 +131,13 @@ private:
       return(m_logger.IsDebugEnabled());
      }
 
+   void              Emit(const RiskEvent &risk_event)
+     {
+      if(CheckPointer(m_listener)==POINTER_INVALID)
+         return;
+      m_listener.OnRiskEvent(risk_event);
+     }
+
    //--- state ---------------------------------------------------------
    void              ResetState()
      {
@@ -135,6 +147,7 @@ private:
       m_current_status=DATA_STATUS_UNAVAILABLE;
       m_current_error=RM_MSG_NOT_COLLECTED;
       m_cycle_count=0;
+      m_cycle_time=0;
 
       m_has_last_success=false;
       AccountSnapshotReset(m_last_success);
@@ -189,6 +202,12 @@ private:
                Log(RM_LOG_INFO,RM_EVENT_TERMINAL_RECONNECTED,"Terminal connected to the trade server (it was not connected when the EA started)"+outage);
             else
                Log(RM_LOG_INFO,RM_EVENT_TERMINAL_RECONNECTED,"Terminal reconnected to the trade server"+outage);
+            RiskEvent reconnected;
+            RiskEventReset(reconnected,RM_EVENT_TERMINAL_RECONNECTED,RM_LOG_INFO,observed_at);
+            reconnected.flag=m_disconnected_at_start;
+            if(m_disconnected_since>0 && observed_at>=m_disconnected_since)
+               reconnected.seconds=(long)observed_at-(long)m_disconnected_since;
+            Emit(reconnected);
            }
          m_connection_state=RM_CONNECTION_CONNECTED;
          m_disconnected_since=0;
@@ -203,6 +222,10 @@ private:
          else
             Log(RM_LOG_WARNING,RM_EVENT_TERMINAL_DISCONNECTED,"Terminal lost the connection to the trade server");
          m_disconnected_since=observed_at;
+         RiskEvent disconnected;
+         RiskEventReset(disconnected,RM_EVENT_TERMINAL_DISCONNECTED,RM_LOG_WARNING,observed_at);
+         disconnected.flag=m_disconnected_at_start;
+         Emit(disconnected);
         }
       m_connection_state=RM_CONNECTION_DISCONNECTED;
      }
@@ -232,6 +255,16 @@ private:
       m_in_failure=true;
       m_failure_key="ACCOUNT_IDENTITY_CHANGED";
       Log(RM_LOG_ERROR,RM_EVENT_ACCOUNT_IDENTITY_CHANGED,m_identity_change_message);
+      RiskEvent changed;
+      RiskEventReset(changed,RM_EVENT_ACCOUNT_IDENTITY_CHANGED,RM_LOG_ERROR,m_cycle_time);
+      changed.status=DATA_STATUS_UNAVAILABLE;
+      changed.reason=m_identity_change_message;
+      changed.has_snapshot=m_has_last_success;
+      AccountSnapshotCopy(m_last_success,changed.snapshot);
+      changed.observed_login=snapshot.login;
+      changed.observed_server=snapshot.server;
+      changed.observed_currency=snapshot.currency;
+      Emit(changed);
      }
 
    //--- cycle outcomes ----------------------------------------------
@@ -248,10 +281,18 @@ private:
                   +" reason="+reason
                   +" consecutive_failed_cycles="+IntegerToString(m_consecutive_failures)
                   +" last_successful_collection="+LastSuccessText();
+      ENUM_RM_LOG_LEVEL level=RM_LOG_ERROR;
       if(environmental)
-         Log(RM_LOG_WARNING,RM_EVENT_ACCOUNT_COLLECTION_FAILED,text);
-      else
-         Log(RM_LOG_ERROR,RM_EVENT_ACCOUNT_COLLECTION_FAILED,text);
+         level=RM_LOG_WARNING;
+      Log(level,RM_EVENT_ACCOUNT_COLLECTION_FAILED,text);
+      RiskEvent failed;
+      RiskEventReset(failed,RM_EVENT_ACCOUNT_COLLECTION_FAILED,level,m_cycle_time);
+      failed.status=status;
+      failed.reason=reason;
+      failed.count=m_consecutive_failures;
+      failed.has_snapshot=m_has_last_success;
+      AccountSnapshotCopy(m_last_success,failed.snapshot);
+      Emit(failed);
      }
 
    void              HandleSuccess(AccountSnapshot &snapshot)
@@ -289,6 +330,17 @@ private:
          if(recovered)
             Log(RM_LOG_INFO,RM_EVENT_ACCOUNT_COLLECTION_SUCCESS,
                 "Account collection recovered after "+IntegerToString(failed_before)+" failed cycle(s)");
+      if(first_valid || recovered)
+        {
+         RiskEvent succeeded;
+         RiskEventReset(succeeded,RM_EVENT_ACCOUNT_COLLECTION_SUCCESS,RM_LOG_INFO,snapshot.collection_time);
+         succeeded.status=DATA_STATUS_VALID;
+         succeeded.flag=first_valid;
+         succeeded.count=failed_before;
+         succeeded.has_snapshot=true;
+         AccountSnapshotCopy(snapshot,succeeded.snapshot);
+         Emit(succeeded);
+        }
 
       if(IsDebugLogging())
          Log(RM_LOG_DEBUG,RM_EVENT_ACCOUNT_COLLECTION_SUCCESS,
@@ -316,6 +368,7 @@ private:
       //--- 1. raw collection (resets the snapshot first)
       AccountSnapshot snapshot;
       bool collected=m_account_engine.Collect(snapshot);
+      m_cycle_time=snapshot.collection_time;
 
       //--- 2. connection transitions
       if(m_account_engine.GetLastCollectResult()!=RM_COLLECT_NOT_INITIALIZED)
@@ -360,6 +413,7 @@ public:
                      CCoreEngine()
      {
       m_logger=NULL;
+      m_listener=NULL;
       m_config.account_refresh_seconds=0;
       m_config.enable_logging=false;
       m_config.enable_debug_logging=false;
@@ -389,6 +443,12 @@ public:
       m_logger=logger;
       m_configured=true;
       return(true);
+     }
+
+   //--- additive (Telegram add-on): receiver of state-transition events (NULL = none)
+   void              SetEventListener(CRiskEventListener *listener)
+     {
+      m_listener=listener;
      }
 
    //--- TEST SUPPORT ONLY: forwards a controlled data source to the account engine
@@ -439,6 +499,7 @@ public:
       ResetState();
       m_configured=false;
       m_logger=NULL;
+      m_listener=NULL;
      }
 
    //--- true ONLY for current VALID data (see invariant I3)

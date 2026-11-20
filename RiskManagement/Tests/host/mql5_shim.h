@@ -6,8 +6,12 @@
 //
 // Only the MQL5 functions/constants that M1 is allowed to use are provided.
 // Deliberately absent: every trading / order / position / deal / history API,
-// CTrade, files, network, chart objects, Sleep. If any M1 source referenced one
-// of them, the host build would fail to compile (an extra read-only check).
+// CTrade, files, chart objects, Sleep. If any source referenced one of them,
+// the host build would fail to compile (an extra read-only check).
+// WebRequest is emulated (recorder + scripted responses) for the Telegram add-on.
+//
+// Strings are UTF-8 std::string; StringLen / StringFind / StringSubstr /
+// StringGetCharacter work on Unicode code points like MQL5 (UTF-16, BMP only).
 //
 // Enum values for account properties and margin modes are intentionally NOT
 // the (undocumented) MT5 numbers, to prove the sources only use names.
@@ -17,6 +21,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
+#include <cstdlib>
 #include <ctime>
 #include <iostream>
 #include <map>
@@ -158,6 +163,45 @@ inline string EnumToString(ENUM_ACCOUNT_INFO_STRING value)
    return "ENUM_ACCOUNT_INFO_STRING::" + std::to_string(static_cast<int>(value));
 }
 
+#define WHOLE_ARRAY (-1)
+#define CP_ACP 0
+#define CP_UTF8 65001
+
+enum ENUM_MQL_INFO_INTEGER
+{
+   MQL_TESTER = 600,
+   MQL_OPTIMIZATION,
+   MQL_VISUAL_MODE
+};
+
+// MQL5 dynamic array "char x[];" (the build script rewrites the declaration)
+template <typename T>
+struct MqlDynArray
+{
+   std::vector<T> items;
+   T &operator[](int index) { return items[static_cast<std::size_t>(index)]; }
+   const T &operator[](int index) const { return items[static_cast<std::size_t>(index)]; }
+};
+
+template <typename T>
+inline int ArrayResize(MqlDynArray<T> &array, int size)
+{
+   array.items.resize(static_cast<std::size_t>(size < 0 ? 0 : size));
+   return static_cast<int>(array.items.size());
+}
+
+template <typename T>
+inline int ArraySize(const MqlDynArray<T> &array) { return static_cast<int>(array.items.size()); }
+
+struct ShimWebRequestRecord
+{
+   string method;
+   string url;
+   string headers;
+   int timeout = 0;
+   string body;
+};
+
 // ------------------------------------------------- simulated terminal state
 struct ShimTerminalState
 {
@@ -197,6 +241,12 @@ struct ShimTerminalState
 
    int account_reads = 0;
    int expert_remove_calls = 0;
+
+   bool tester = false;
+   int web_status = 200; // HTTP status returned by WebRequest, or -1
+   int web_error = 0;    // GetLastError() when web_status == -1
+   string web_response = "{\"ok\":true,\"result\":{}}";
+   std::vector<ShimWebRequestRecord> web_requests;
 
    std::vector<string> printed;
    bool echo = true;
@@ -334,30 +384,135 @@ inline double MathExp(double value) { return std::exp(value); }
 inline bool MathIsValidNumber(double value) { return std::isfinite(value); }
 
 // ------------------------------------------------------------------ strings
-inline int StringLen(const string &text) { return static_cast<int>(text.size()); }
+// byte offset of every code point, plus the total size at the end
+inline std::vector<std::size_t> ShimCodePointOffsets(const string &text)
+{
+   std::vector<std::size_t> offsets;
+   std::size_t i = 0;
+   while (i < text.size())
+   {
+      offsets.push_back(i);
+      unsigned char lead = static_cast<unsigned char>(text[i]);
+      std::size_t length = 1;
+      if (lead >= 0xF0)
+         length = 4;
+      else if (lead >= 0xE0)
+         length = 3;
+      else if (lead >= 0xC0)
+         length = 2;
+      i += length;
+   }
+   offsets.push_back(text.size());
+   return offsets;
+}
+
+inline int StringLen(const string &text) { return static_cast<int>(ShimCodePointOffsets(text).size()) - 1; }
 
 inline int StringFind(const string &text, const string &match, int start = 0)
 {
+   std::vector<std::size_t> offsets = ShimCodePointOffsets(text);
+   int count = static_cast<int>(offsets.size()) - 1;
    if (start < 0)
       start = 0;
-   std::size_t position = text.find(match, static_cast<std::size_t>(start));
-   return position == string::npos ? -1 : static_cast<int>(position);
+   if (start > count)
+      return -1;
+   std::size_t position = text.find(match, offsets[static_cast<std::size_t>(start)]);
+   if (position == string::npos)
+      return -1;
+   for (int i = 0; i <= count; i++)
+      if (offsets[static_cast<std::size_t>(i)] == position)
+         return i;
+   return -1;
 }
 
 inline string StringSubstr(const string &text, int start, int length = -1)
 {
-   if (start < 0 || start >= static_cast<int>(text.size()))
+   std::vector<std::size_t> offsets = ShimCodePointOffsets(text);
+   int count = static_cast<int>(offsets.size()) - 1;
+   if (start < 0 || start >= count)
       return "";
-   if (length < 0)
-      return text.substr(static_cast<std::size_t>(start));
-   return text.substr(static_cast<std::size_t>(start), static_cast<std::size_t>(length));
+   int stop = (length < 0 || start + length > count) ? count : start + length;
+   std::size_t from = offsets[static_cast<std::size_t>(start)];
+   return text.substr(from, offsets[static_cast<std::size_t>(stop)] - from);
 }
 
 inline ushort StringGetCharacter(const string &text, int position)
 {
-   if (position < 0 || position >= static_cast<int>(text.size()))
+   std::vector<std::size_t> offsets = ShimCodePointOffsets(text);
+   int count = static_cast<int>(offsets.size()) - 1;
+   if (position < 0 || position >= count)
       return 0;
-   return static_cast<unsigned char>(text[static_cast<std::size_t>(position)]);
+   std::size_t i = offsets[static_cast<std::size_t>(position)];
+   unsigned char lead = static_cast<unsigned char>(text[i]);
+   unsigned int code = lead;
+   std::size_t extra = 0;
+   if (lead >= 0xE0) { code = lead & 0x0F; extra = 2; }
+   else if (lead >= 0xC0) { code = lead & 0x1F; extra = 1; }
+   for (std::size_t k = 1; k <= extra && i + k < text.size(); k++)
+      code = (code << 6) | (static_cast<unsigned char>(text[i + k]) & 0x3F);
+   return static_cast<ushort>(code);
+}
+
+inline int StringReplace(string &text, const string &find, const string &replacement)
+{
+   if (find.empty())
+      return 0;
+   int count = 0;
+   std::size_t position = 0;
+   while ((position = text.find(find, position)) != string::npos)
+   {
+      text.replace(position, find.size(), replacement);
+      position += replacement.size();
+      count++;
+   }
+   return count;
+}
+
+inline long long StringToInteger(const string &text) { return std::strtoll(text.c_str(), nullptr, 10); }
+
+// shim strings are already UTF-8: CP_UTF8 conversion is a byte copy (+ terminating 0)
+inline int StringToCharArray(const string &text, MqlDynArray<char> &array, int start = 0, int count = -1, unsigned int codepage = CP_ACP)
+{
+   (void)start;
+   (void)count;
+   (void)codepage;
+   array.items.assign(text.begin(), text.end());
+   array.items.push_back(0);
+   return static_cast<int>(array.items.size());
+}
+
+inline string CharArrayToString(const MqlDynArray<char> &array, int start = 0, int count = -1, unsigned int codepage = CP_ACP)
+{
+   (void)count;
+   (void)codepage;
+   string result;
+   for (std::size_t i = static_cast<std::size_t>(start); i < array.items.size() && array.items[i] != 0; i++)
+      result.push_back(array.items[i]);
+   return result;
+}
+
+inline int MQLInfoInteger(int property) { return property == MQL_TESTER && g_shim.tester ? 1 : 0; }
+
+// ---------------------------------------------------------------- WebRequest
+inline int WebRequest(const string &method, const string &url, const string &headers, int timeout,
+                      const MqlDynArray<char> &data, MqlDynArray<char> &result, string &result_headers)
+{
+   ShimWebRequestRecord record;
+   record.method = method;
+   record.url = url;
+   record.headers = headers;
+   record.timeout = timeout;
+   record.body.assign(data.items.begin(), data.items.end());
+   g_shim.web_requests.push_back(record);
+   result_headers = "";
+   result.items.clear();
+   if (g_shim.web_status == -1)
+   {
+      g_shim_last_error = g_shim.web_error;
+      return -1;
+   }
+   result.items.assign(g_shim.web_response.begin(), g_shim.web_response.end());
+   return g_shim.web_status;
 }
 
 inline string IntegerToString(long long value, int /*str_len*/ = 0, ushort /*fill*/ = ' ')

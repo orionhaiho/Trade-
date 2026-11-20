@@ -11,4 +11,11 @@
 [HOST-E] PASS E11 server time unavailable -> UNAVAILABLE, logged once, local time never used (6 checks)
 [HOST-E] PASS E12 identity change without re-init -> latched UNAVAILABLE, reads stop, logged once (5 checks)
 [HOST-E] PASS E13 terminal API error (GetLastError) -> UNAVAILABLE naming the property (5 checks)
-[HOST-E] SUMMARY total=13 passed=13 failed=0
+[HOST-E] PASS E14 Telegram: start message sent by WebRequest, in Vietnamese, after the first refresh (14 checks)
+[HOST-E] PASS E15 Telegram: invalid token -> OnInit rejected, token not logged, no request (4 checks)
+[HOST-E] PASS E16 Telegram: WebRequest not allowed (4014) -> monitoring unaffected, one ERROR, retried (7 checks)
+[HOST-E] PASS E17 Telegram: stop message flushed in OnDeinit with a short timeout (4 checks)
+[HOST-E] PASS E18 Telegram disabled (default): no network call in the whole lifecycle (2 checks)
+[HOST-E] PASS E19 Telegram: invalid refresh input is still reported to Telegram (4 checks)
+[HOST-E] PASS E20 Telegram: disconnect/reconnect messages and periodic summary (6 checks)
+[HOST-E] SUMMARY total=20 passed=20 failed=0

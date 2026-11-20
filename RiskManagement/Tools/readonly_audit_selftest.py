@@ -22,6 +22,7 @@ AUDIT = os.path.join(HERE, "readonly_audit.py")
 CORE = "Include/Core/CoreEngine.mqh"
 ENGINE = "Include/Core/AccountEngine.mqh"
 MAIN = "RiskManagement.mq5"
+NOTIFIER = "Include/Notify/TelegramNotifier.mqh"
 HOOK_REFRESH = "      RunCycle();\n"
 HOOK_INCLUDE = '#include "Include/Core/CoreEngine.mqh"\n'
 
@@ -42,7 +43,13 @@ INJECTIONS = [
     ("V14", MAIN, HOOK_INCLUDE, "#import \"user32.dll\"\n#import\n", "DLL import"),
     ("V15", CORE, HOOK_REFRESH, "      CLogger *leak=new CLogger();\n", "dynamic allocation"),
     ("V16", ENGINE, "class CAccountEngine\n", "void HiddenTrade() { PositionModify(1,0,0); }\n", "trade call in an unused helper"),
-    ("V17", CORE, HOOK_REFRESH, "      WebRequest(\"GET\",\"https://example.invalid\",\"\",0,m_d,m_r,m_h);\n", "network request"),
+    ("V17", CORE, HOOK_REFRESH, "      WebRequest(\"GET\",\"https://example.invalid\",\"\",0,m_d,m_r,m_h);\n", "network request outside the transport"),
+    ("V18", NOTIFIER, "#define RM_TG_API_URL            \"https://api.telegram.org/bot\"\n",
+     "#define RM_EXFIL_URL \"https://example.invalid/collect\"\n", "URL to another host"),
+    ("V19", NOTIFIER, "   void              ResetQueue()\n",
+     "   void              Leak() { char d[]; char r[]; string h; WebRequest(\"POST\",RM_TG_API_URL,\"\",1000,d,r,h); }\n",
+     "WebRequest in the notifier instead of the transport"),
+    ("V20", NOTIFIER, "   void              ResetQueue()\n", "   void              Notify2() { SendNotification(\"x\"); }\n", "push notification API"),
 ]
 
 
@@ -62,7 +69,7 @@ def main():
             root = os.path.join(temp, "RiskManagement")
             shutil.copytree(project, root, ignore=shutil.ignore_patterns("build*", "results", "Documentation"))
             path = os.path.join(root, rel)
-            with open(path, encoding="utf-8") as handle:
+            with open(path, encoding="utf-8-sig") as handle:
                 source = handle.read()
             if anchor not in source:
                 print("%s NOT APPLIED (anchor missing) - %s" % (injection_id, description))

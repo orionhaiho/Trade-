@@ -15,6 +15,8 @@ Checks every MQL5 source file of the project:
      TerminalInfoInteger and TimeTradeServer may only be called inside
      CTerminalAccountDataSource
   F. no dynamic allocation (new/delete), no while-loops (busy wait)
+  G. Telegram add-on: WebRequest only inside CWebRequestTransport, and every
+     URL in any string literal is https://api.telegram.org
 
 Comments and string literals are removed before matching, so text such as
 "no OrderSend here" in a comment never hides or fakes a finding. Mentions in
@@ -51,7 +53,7 @@ FORBIDDEN = [
     "FileOpen", "FileClose", "FileWrite", "FileWriteString", "FileWriteArray", "FileWriteStruct",
     "FileWriteDouble", "FileWriteInteger", "FileWriteLong", "FileDelete", "FileMove", "FileCopy",
     "FileFlush", "FolderCreate", "FolderDelete", "FolderClean",
-    "WebRequest", "SocketCreate", "SocketConnect", "SocketSend", "SocketTlsSend",
+    "SocketCreate", "SocketConnect", "SocketSend", "SocketTlsSend",
     "SendFTP", "SendMail", "SendNotification",
     # chart / UI
     "ObjectCreate", "ObjectDelete", "ObjectsDeleteAll", "ObjectSetInteger", "ObjectSetDouble",
@@ -74,6 +76,9 @@ ALLOWED_PRODUCTION = {
     "StringLen", "StringFind", "StringSubstr", "StringGetCharacter",
     "IntegerToString", "DoubleToString", "TimeToString", "EnumToString",
     "CheckPointer", "GetPointer",
+    # Telegram add-on (network only through CWebRequestTransport, see NETWORK_ONLY)
+    "WebRequest", "StringToCharArray", "CharArrayToString", "ArrayResize",
+    "StringReplace", "StringToInteger", "MQLInfoInteger",
 }
 # extra functions allowed in the test harness only
 ALLOWED_TEST_ONLY = {"MathExp", "ExpertRemove"}
@@ -81,7 +86,14 @@ ALLOWED_TEST_ONLY = {"MathExp", "ExpertRemove"}
 ACCOUNT_APIS = {"AccountInfoInteger", "AccountInfoDouble", "AccountInfoString"}
 # may be called only inside CTerminalAccountDataSource
 DATA_SOURCE_ONLY = ACCOUNT_APIS | {"TerminalInfoInteger", "TimeTradeServer"}
-TERMINAL_APIS = DATA_SOURCE_ONLY | {"TimeLocal", "EventSetTimer", "EventKillTimer"}
+TERMINAL_APIS = DATA_SOURCE_ONLY | {"TimeLocal", "EventSetTimer", "EventKillTimer", "WebRequest"}
+# may be called only inside CWebRequestTransport
+NETWORK_ONLY = {"WebRequest"}
+NETWORK_CLASS = "CWebRequestTransport"
+# the only URL host allowed in any string literal (https only)
+ALLOWED_URL_HOST = "api.telegram.org"
+URL_RE = re.compile(r"(\w+)://([^/\s\"']*)")
+STRING_LITERAL_RE = re.compile(r'"((?:[^"\\\n]|\\.)*)"')
 
 KEYWORDS = {"if", "for", "while", "switch", "return", "sizeof", "case", "do", "else",
             "catch", "delete", "new", "operator", "template", "typename", "defined"}
@@ -124,6 +136,22 @@ def strip_comments_and_strings(text):
         else:
             out.append(c)
             i += 1
+    return "".join(out)
+
+
+def strip_comments_only(text):
+    """Remove comments but keep string literals (for the URL check)."""
+    code = strip_comments_and_strings(text)
+    out = []
+    in_string = False
+    for t, c in zip(text, code):
+        if c in "\"'" and t == c:
+            in_string = not in_string if c == '"' else in_string
+            out.append(t)
+        elif c == " " and t != " " and not in_string:
+            out.append(" " if t != "\n" else "\n")
+        else:
+            out.append(t)
     return "".join(out)
 
 
@@ -181,7 +209,7 @@ def audit(root):
     sources = {}
 
     for path in production + tests:
-        with open(path, encoding="utf-8") as handle:
+        with open(path, encoding="utf-8-sig") as handle:
             raw = handle.read()
         code = strip_comments_and_strings(raw)
         sources[path] = (raw, code)
@@ -255,6 +283,16 @@ def audit(root):
                 api_sites.append((rel, line, name, owner))
                 if name in DATA_SOURCE_ONLY and owner != "CTerminalAccountDataSource":
                     findings.append(("FAIL", rel, line, "%s called outside CTerminalAccountDataSource" % name))
+                if name in NETWORK_ONLY and owner != NETWORK_CLASS:
+                    findings.append(("FAIL", rel, line, "%s called outside %s" % (name, NETWORK_CLASS)))
+
+        # G. URLs in string literals (comments removed first)
+        code_with_strings = strip_comments_only(raw)
+        for m in STRING_LITERAL_RE.finditer(code_with_strings):
+            for url in URL_RE.finditer(m.group(1)):
+                if url.group(1).lower() != "https" or url.group(2).lower() != ALLOWED_URL_HOST:
+                    findings.append(("FAIL", rel, line_of(code_with_strings, m.start()),
+                                     "URL other than https://%s in a string literal: %s" % (ALLOWED_URL_HOST, url.group(0))))
 
         # F. dynamic allocation / loops
         for m in re.finditer(r"\b(new|delete)\b", code):

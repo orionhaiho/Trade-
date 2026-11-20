@@ -10,7 +10,9 @@
 # The original sources are never modified. A temporary copy receives only these
 # mechanical transforms:
 #   - '#property ...' lines removed (MQL5-only directive)
-#   - 'm_source.' / 'm_logger.' -> '->' (MQL5 accesses object pointers with '.')
+#   - 'm_source.' / 'm_logger.' / 'm_listener.' / 'm_transport.' -> '->'
+#     (MQL5 accesses object pointers with '.')
+#   - 'char name[];' -> 'MqlDynArray<char> name;' (MQL5 dynamic array syntax)
 #
 # Results are HOST-SIMULATED evidence only. They do not replace compiling with
 # MetaEditor and running the harness inside MetaTrader 5.
@@ -35,7 +37,10 @@ find "${BUILD_DIR}/src" -type f \( -name '*.mq5' -o -name '*.mqh' \) -print0 \
    | xargs -0 sed -i -E \
         -e '/^[[:space:]]*#property[[:space:]]/d' \
         -e 's/\bm_source\./m_source->/g' \
-        -e 's/\bm_logger\./m_logger->/g'
+        -e 's/\bm_logger\./m_logger->/g' \
+        -e 's/\bm_listener\./m_listener->/g' \
+        -e 's/\bm_transport\./m_transport->/g' \
+        -e 's/\bchar ([A-Za-z_][A-Za-z0-9_]*)\[\];/MqlDynArray<char> \1;/g'
 
 {
    echo "date_utc: $(date -u '+%Y-%m-%d %H:%M:%S')"
