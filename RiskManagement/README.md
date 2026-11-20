@@ -13,6 +13,7 @@ Expert Advisor MQL5 cho MetaTrader 5 (Exness). Nó thu thập snapshot tài kho�
 | `Include/Models/` | `ENUM_DATA_STATUS`, `AccountSnapshot` |
 | `Include/Validation/` | `CDataValidator` |
 | `Include/Utils/` | `CLogger` |
+| `Include/Notify/` | Thông báo Telegram tiếng Việt (tùy chọn, mặc định tắt) — xem `Documentation/Telegram_Setup_Guide.md` |
 | `Tests/RiskManagement_M1_Tests.mq5` | Test harness MQL5 (dữ liệu giả lập) |
 | `Tests/host/` | Build C++ để chạy test trên host, mutation check, kết quả |
 | `Tools/` | Audit read-only + tự kiểm tra |

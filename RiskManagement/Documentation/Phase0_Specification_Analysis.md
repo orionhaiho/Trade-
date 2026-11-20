@@ -4,6 +4,7 @@
 **Milestone:** M1 — Core & Account Engine (Specification v1.0)
 **Quyền:** Strict read-only
 **Trạng thái tài liệu:** Phân tích + thiết kế (viết trước khi code).
+**Rev2 — 2026-11-20:** người dùng yêu cầu thêm thông báo Telegram tiếng Việt → thay đổi đặc tả D-27 (§3.2).
 **Rev1 — 2026-11-19:** đã nhận quyết định của người dùng cho Q-01…Q-04 (§3.1); D-21 cập nhật theo API bổ sung thực tế. Trạng thái triển khai/kiểm chứng xem `M1_Implementation_Report.md`, `M1_Test_Report.md`.
 
 ---
@@ -159,6 +160,7 @@ Nguồn: §x = mục của master prompt. Trạng thái hiện tại của tất
 | D-24 | **Rủi ro Exness Unlimited leverage:** chưa biết `ACCOUNT_LEVERAGE` trả gì. Nếu ≤ 0 thì theo đặc tả sẽ `INVALID` → cần quyết định đặc tả. Phải kiểm tra trên tài khoản thật (F012) | Môi trường |
 | D-25 | **Giới hạn:** MT5 không có API đọc nguyên khối thông tin tài khoản; các trường được đọc liên tiếp trong cùng một chu kỳ, có thể lệch rất nhỏ giữa các trường | Môi trường |
 | D-26 | Không `Comment()`, `Alert()`, chart object, file, network, `Sleep()` | §7.3 |
+| **D-27** | **Thay đổi đặc tả do người dùng yêu cầu (2026-11-20): thêm Telegram.** Mục bị ảnh hưởng: §5 ("Tuyệt đối không triển khai Telegram integration"), §7.3 ("không network request"). Phương án: module tùy chọn `Include/Notify/` (mặc định tắt), gửi một chiều qua HTTPS chỉ tới `api.telegram.org`; `WebRequest` chỉ được gọi trong `CWebRequestTransport` (audit kiểm tra); tối đa 1 request/chu kỳ, sau khi làm mới dữ liệu; token không bao giờ được log. Tác động API: thêm 5 input `InpTelegram*`, `CCoreEngine::SetEventListener()`, `RiskEvent`/`CRiskEventListener`, 2 event code `TELEGRAM_SEND_FAILED`/`TELEGRAM_SEND_RECOVERED`, thư mục `Include/Notify/` ngoài cấu trúc bắt buộc. Data contract M1 và mọi chữ ký đã đặc tả **không đổi**. Bất biến read-only **giữ nguyên** (không có API giao dịch). Trạng thái: **đã được người dùng yêu cầu** | Yêu cầu của người dùng |
 
 ---
 

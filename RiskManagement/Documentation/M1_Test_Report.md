@@ -19,9 +19,9 @@ Bằng chứng (đều nằm trong `Tests/host/results/`):
 |---|---|
 | `host_build_info.txt` | Thời điểm, compiler, cờ build |
 | `host_compile_harness.log`, `host_compile_entrypoint.log`, `host_compile_log_sample.log` | Log compile host (rỗng = 0 lỗi, 0 cảnh báo) |
-| `host_harness_output.txt` | Kết quả harness: **total=48 passed=46 failed=0 not_run=2** |
-| `host_entrypoint_output.txt` | Kết quả lifecycle entry point: **total=13 passed=13 failed=0** |
-| `host_mutation_check.txt` | 19/19 lỗi cố ý cài vào đều bị test phát hiện |
+| `host_harness_output.txt` | Kết quả harness: **total=62 passed=60 failed=0 not_run=2** |
+| `host_entrypoint_output.txt` | Kết quả lifecycle entry point: **total=20 passed=20 failed=0** |
+| `host_mutation_check.txt` | 26/26 lỗi cố ý cài vào đều bị test phát hiện |
 | `host_log_sample.txt` | Bản log mô phỏng của tab Experts |
 | `readonly_audit_output.md`, `readonly_audit_selftest_output.txt` | Audit read-only + tự kiểm tra |
 
@@ -103,9 +103,37 @@ Chạy lại: `bash Tests/host/run_host_tests.sh`, `bash Tests/host/run_mutation
 | E12 | Đổi identity khi không reload → chốt, ngừng đọc, log 1 lần | **PASS** |
 | E13 | Lỗi API (`GetLastError`) → UNAVAILABLE nêu property | **PASS** |
 
+## 3b. Telegram add-on (Rev2) — Host-sim
+
+| Test ID | Mô tả | Kết quả |
+|---|---|---|
+| N01 | File tiếng Việt được đọc là UTF-8 (ký tự U+1EA1) | **PASS** |
+| N02 | Kiểm tra token / chat_id / chu kỳ tóm tắt / timeout | **PASS** |
+| N03 | Sự kiện core → 1 tin tiếng Việt: URL `sendMessage`, chat_id, JSON | **PASS** |
+| N04 | Chỉ gửi khi chuyển trạng thái (30 chu kỳ lỗi → 1 tin) | **PASS** |
+| N05 | Gộp nhiều tin vào 1 request | **PASS** |
+| N06 | Lỗi mạng: giữ tin, back-off tăng gấp đôi, log 1 lần, log phục hồi | **PASS** |
+| N07 | HTTP 429 theo `retry_after` | **PASS** |
+| N08 | HTTP 401 tắt Telegram; token không xuất hiện trong log | **PASS** |
+| N09 | Lỗi 4014: log hướng dẫn thêm URL, vẫn thử lại | **PASS** |
+| N10 | Hàng đợi có giới hạn, báo số tin bị bỏ | **PASS** |
+| N11 | Escape JSON | **PASS** |
+| N12 | Chế độ khởi động: không gửi trùng | **PASS** |
+| N13 | Mọi sự kiện có tin nhắn; đổi tài khoản nêu cả hai tài khoản | **PASS** |
+| N14 | Tóm tắt định kỳ: giá trị hiện tại hoặc ghi rõ dữ liệu cũ | **PASS** |
+| E14 | Qua `WebRequest` thật của entry point: tin khởi động UTF-8, không gửi trong `OnInit`, không gửi byte 0 | **PASS** |
+| E15 | Token sai → EA không khởi động, token không bị log | **PASS** |
+| E16 | Lỗi 4014: giám sát vẫn VALID, 1 ERROR, thử lại, log phục hồi | **PASS** |
+| E17 | Tin "EA đã dừng" gửi trong `OnDeinit`, timeout ≤ 3000 ms | **PASS** |
+| E18 | Telegram tắt (mặc định) → không có request mạng nào | **PASS** |
+| E19 | Input chu kỳ sai vẫn được báo qua Telegram | **PASS** |
+| E20 | Tin mất/có lại kết nối, thời lượng tiếng Việt, tóm tắt mỗi 1 phút | **PASS** |
+
+Trên MT5 thật: **NOT RUN** — làm theo `Telegram_Setup_Guide.md` §6.
+
 ## 4. Mutation check (độ mạnh của test)
 
-19 lỗi cố ý được cài lần lượt vào bản sao tạm; **cả 19 đều làm test thất bại** (`host_mutation_check.txt`).
+26 lỗi cố ý được cài lần lượt vào bản sao tạm; **cả 26 đều làm test thất bại** (`host_mutation_check.txt`).
 
 | ID | Lỗi cài vào | Bị phát hiện bởi |
 |---|---|---|
@@ -128,9 +156,16 @@ Chạy lại: `bash Tests/host/run_host_tests.sh`, `bash Tests/host/run_mutation
 | M17 | Chấp nhận login 0 | F002 T06 T11 |
 | M18 | Không shutdown core khi timer lỗi | E04 |
 | M19 | Timer lỗi nhưng báo thành công | E04 |
+| M20 | Bỏ qua `retry_after` của HTTP 429 | N07 |
+| M21 | Vẫn gửi sau HTTP 401 | N08 |
+| M22 | Log lỗi Telegram mỗi lần thử | N06 N09 |
+| M23 | Gửi cả byte 0 cuối chuỗi | E14 |
+| M24 | Gửi trùng tin lúc khởi động | E14 N12 |
+| M25 | Không escape JSON nội dung tin | N03 N05 |
+| M26 | Không tăng back-off | N06 |
 
 ## 5. Việc còn lại để đạt `M1 ACCEPTED`
 
 1. Compile `RiskManagement.mq5` và `Tests/RiskManagement_M1_Tests.mq5` bằng MetaEditor → gửi tab **Errors** (số error/warning).
-2. Chạy harness trên MT5 → gửi các dòng `[RM-TEST]` (kỳ vọng `SUMMARY total=48 passed=46 failed=0 not_run=2`).
+2. Chạy harness trên MT5 → gửi các dòng `[RM-TEST]` (kỳ vọng `SUMMARY total=62 passed=60 failed=0 not_run=2`).
 3. Chạy checklist thủ công L-01…L-12 (`M1_Installation_Guide.md` §6) trên tài khoản Exness → gửi log tab Experts + ảnh/ghi chú giá trị Toolbox.

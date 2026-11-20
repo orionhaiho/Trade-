@@ -18,6 +18,8 @@
    ├── Include/Models/AccountModel.mqh
    ├── Include/Validation/DataValidator.mqh
    ├── Include/Utils/Logger.mqh
+   ├── Include/Notify/HttpTransport.mqh, TelegramNotifier.mqh, TelegramMessagesVi.mqh
+   ├── Include/Models/RiskEvent.mqh
    └── Tests/RiskManagement_M1_Tests.mq5
    ```
    Các thư mục `Documentation/`, `Tools/`, `Tests/host/` không bắt buộc; MetaEditor bỏ qua chúng.
@@ -34,6 +36,8 @@ Không đổi tên hoặc di chuyển thư mục `Include/`: các `#include` dù
 | `InpEnableLogging` | `true` | Bật log INFO/WARNING | `false`: chỉ còn dòng **ERROR** (lỗi khởi tạo, dữ liệu INVALID/lỗi API, đổi tài khoản) |
 | `InpEnableDebugLogging` | `false` | Mỗi chu kỳ thành công in 1 dòng đủ giá trị | Chỉ hiệu lực khi `InpEnableLogging=true`. Chỉ bật khi kiểm tra (khoảng 86.400 dòng/ngày với chu kỳ 1 s) |
 | `InpRequireConnectedTerminal` | `true` | Bắt buộc có kết nối trade server | `true` (khuyến nghị): mất kết nối → `UNAVAILABLE`. `false`: dữ liệu lúc mất kết nối được gắn `STALE`, không bao giờ `VALID` |
+
+Thông báo Telegram tiếng Việt (tùy chọn, mặc định tắt): `InpTelegramEnable`, `InpTelegramBotToken`, `InpTelegramChatId`, `InpTelegramSummaryMinutes`, `InpTelegramTimeoutMs`. Cách tạo bot và cấu hình: xem **`Telegram_Setup_Guide.md`**.
 
 Gắn EA: Navigator → Expert Advisors → `RiskManagement` → kéo vào **một** chart bất kỳ (symbol/timeframe không ảnh hưởng). EA không cần **Allow Algo Trading**; có thể để tắt như một lớp an toàn bổ sung (xem L-14).
 
@@ -67,7 +71,7 @@ Log mẫu (mô phỏng trên host, file `Tests/host/results/host_log_sample.txt`
 
 1. Navigator → Expert Advisors → `RiskManagement` → `Tests` → `RiskManagement_M1_Tests` → kéo vào một chart bất kỳ (demo hay real đều được: harness **chỉ dùng dữ liệu giả lập**, không đọc tài khoản thật, không giao dịch).
 2. Tab Experts sẽ in các dòng `[RM-TEST] ...`, sau đó harness tự gỡ khỏi chart (`ExpertRemove`). Nếu nó vẫn còn trên chart, gỡ bằng tay.
-3. Kỳ vọng: `[RM-TEST] SUMMARY total=48 passed=46 failed=0 not_run=2` và `[RM-TEST] RESULT: all executed tests passed`. Hai test F026 và F030 là `NOT RUN` theo thiết kế (lý do in ngay trên dòng của chúng).
+3. Kỳ vọng: `[RM-TEST] SUMMARY total=62 passed=60 failed=0 not_run=2` và `[RM-TEST] RESULT: all executed tests passed`. Hai test F026 và F030 là `NOT RUN` theo thiết kế (lý do in ngay trên dòng của chúng).
 4. Gửi lại toàn bộ các dòng `[RM-TEST]`.
 
 ## 6. Checklist kiểm tra trên tài khoản Exness (thủ công)

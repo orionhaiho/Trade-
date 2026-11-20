@@ -1,12 +1,12 @@
 # M1 — Báo cáo audit read-only
 
-**Ngày:** 2026-11-19 · **Kết luận: PASS — không tồn tại đường gọi nào có thể tạo, sửa, hủy hoặc đóng lệnh/position.**
+**Ngày:** 2026-11-19 · **Rev2 2026-11-20** (Telegram add-on) · **Kết luận: PASS — không tồn tại đường gọi nào có thể tạo, sửa, hủy hoặc đóng lệnh/position.** Kết nối mạng duy nhất là HTTPS một chiều tới `api.telegram.org`, chỉ khi bật Telegram.
 
 ## 1. Phạm vi
 
 | Nhóm | File |
 |---|---|
-| Production | `RiskManagement.mq5`, `Include/Core/CoreEngine.mqh`, `Include/Core/AccountEngine.mqh`, `Include/Models/AccountModel.mqh`, `Include/Validation/DataValidator.mqh`, `Include/Utils/Logger.mqh` |
+| Production | `RiskManagement.mq5`, `Include/Core/CoreEngine.mqh`, `Include/Core/AccountEngine.mqh`, `Include/Models/AccountModel.mqh`, `Include/Models/RiskEvent.mqh`, `Include/Validation/DataValidator.mqh`, `Include/Utils/Logger.mqh`, `Include/Notify/HttpTransport.mqh`, `Include/Notify/TelegramNotifier.mqh`, `Include/Notify/TelegramMessagesVi.mqh` |
 | Test harness | `Tests/RiskManagement_M1_Tests.mq5` (chỉ dữ liệu giả lập) |
 
 Không file nào include thư viện chuẩn MQL5 (`<...>`); mọi `#include` đều là đường dẫn tương đối tới chính các file trên → không có dependency ẩn.
@@ -21,7 +21,8 @@ Không file nào include thư viện chuẩn MQL5 (`<...>`); mọi `#include` đ
 | D | Whitelist lời gọi: mọi định danh được gọi phải do dự án định nghĩa hoặc nằm trong danh sách API chỉ-đọc (§3) | 0 vi phạm |
 | E | `AccountInfo*`, `TerminalInfoInteger`, `TimeTradeServer` chỉ được gọi trong `CTerminalAccountDataSource` | Đúng (bảng §4) |
 | F | Không `new`/`delete`; vòng `while` được review thủ công | 0 `new`/`delete`; 1 `while` (§5) |
-| G | Tự kiểm tra audit: cài lần lượt 17 vi phạm vào bản sao tạm | **17/17 bị phát hiện** |
+| G | Tự kiểm tra audit: cài lần lượt 20 vi phạm vào bản sao tạm | **20/20 bị phát hiện** |
+| G2 | (Rev2) `WebRequest` chỉ được gọi trong `CWebRequestTransport`; mọi URL trong chuỗi phải là `https://api.telegram.org` | 0 vi phạm |
 | H | Build host: `mql5_shim.h` cố ý không định nghĩa bất kỳ API giao dịch nào → nếu source tham chiếu tới, build sẽ lỗi | Build 0 lỗi, 0 cảnh báo |
 | I | Review thủ công: event handler chỉ có `OnInit`, `OnTimer`, `OnDeinit` (không `OnTick`, `OnTrade`, `OnTradeTransaction`, `OnChartEvent`); không nhánh chết, không code bị tắt bằng macro | Đạt |
 
@@ -40,6 +41,9 @@ Công cụ: `Tools/readonly_audit.py`, `Tools/readonly_audit_selftest.py`. Outpu
 | `MathIsValidNumber`, `MathSqrt` | validator, model | Kiểm tra NaN/Inf; tạo sentinel NaN | Hàm toán thuần |
 | `StringLen`, `StringFind`, `StringSubstr`, `StringGetCharacter`, `IntegerToString`, `DoubleToString`, `TimeToString`, `EnumToString` | toàn bộ | Định dạng chuỗi | Hàm thuần |
 | `CheckPointer`, `GetPointer` | engine | Kiểm tra / lấy con trỏ đối tượng tự động | Không cấp phát động |
+| `WebRequest` | `CWebRequestTransport` (Telegram, tùy chọn) | POST `sendMessage` tới `https://api.telegram.org` | Chỉ gửi tin nhắn; phản hồi chỉ được đọc để biết gửi thành công hay chưa, không thực thi gì |
+| `StringToCharArray`, `CharArrayToString`, `ArrayResize`, `StringReplace`, `StringToInteger` | Telegram add-on | Mã hóa UTF-8, JSON, đọc `retry_after` | Hàm thuần |
+| `MQLInfoInteger(MQL_TESTER)` | `RiskManagement.mq5` | Tắt Telegram trong Strategy Tester | Truy vấn môi trường |
 | `MathExp`, `ExpertRemove` | **chỉ test harness** | Tạo ±Inf; harness tự gỡ sau khi chạy | Không chạm tài khoản |
 
 ## 4. Vị trí gọi API terminal / tài khoản (do audit sinh ra)
@@ -55,10 +59,11 @@ Công cụ: `Tools/readonly_audit.py`, `Tools/readonly_audit_selftest.py`. Outpu
 | File | Mục | Kết luận |
 |---|---|---|
 | `Include/Models/AccountModel.mqh` — `AccountModelFormatDouble()` | Vòng `while` cắt số 0 thừa khi hiển thị | Có giới hạn: `keep` giảm mỗi vòng và dừng tại `dot+3`; chỉ xử lý chuỗi cục bộ; **không phải vòng chờ** |
+| `Include/Notify/TelegramNotifier.mqh` — `BuildBatch()` | Vòng `while` gộp tin trong hàng đợi | Có giới hạn: tối đa số tin trong hàng đợi (≤ 50), `used` tăng mỗi vòng hoặc `break`; **không phải vòng chờ** |
 
 ## 6. Kết quả self-test của audit (17 vi phạm cài thử)
 
-`OrderSend` trực tiếp · `OrderSendAsync` · `#include <Trade\Trade.mqh>` · đối tượng `CTrade` · `PositionClose` qua member · macro che `OrderSend` · macro dạng hàm · nhánh `#ifdef` · `AccountInfoDouble` ngoài data source · `Sleep` · `FileOpen` · `Comment` · hàm ngoài whitelist · `#import` DLL · `new` · `PositionModify` trong helper không dùng · `WebRequest` → **tất cả bị phát hiện (missed: 0 of 17)**.
+`OrderSend` trực tiếp · `OrderSendAsync` · `#include <Trade\Trade.mqh>` · đối tượng `CTrade` · `PositionClose` qua member · macro che `OrderSend` · macro dạng hàm · nhánh `#ifdef` · `AccountInfoDouble` ngoài data source · `Sleep` · `FileOpen` · `Comment` · hàm ngoài whitelist · `#import` DLL · `new` · `PositionModify` trong helper không dùng · `WebRequest` ngoài transport · URL tới host khác · `WebRequest` trong notifier thay vì transport · `SendNotification` → **tất cả bị phát hiện (missed: 0 of 20)**.
 
 ## 7. Kết luận
 

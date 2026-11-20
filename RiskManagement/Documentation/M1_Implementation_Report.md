@@ -2,7 +2,7 @@
 
 **Dự án:** EA Risk Management — MT5 / MQL5 — Exness — Real account
 **Đặc tả:** M1 v1.0 (thay bằng master prompt, xem Phase 0 §0) + quyết định Q-01…Q-04 (Phase 0 §3.1)
-**Ngày:** 2026-11-19
+**Ngày:** 2026-11-19 · **Rev2 2026-11-20:** thêm module thông báo Telegram tiếng Việt (§9)
 
 ## 0. Trạng thái
 
@@ -11,7 +11,7 @@
 | Implemented | **Có** — đủ 6 file nguồn theo cấu trúc bắt buộc | §1 |
 | Compiled (MetaEditor) | **NOT COMPILED** — container không có MetaEditor/MT5 (`download.mql5.com` bị chặn) | — |
 | Static-reviewed | **Có** | §5, `M1_ReadOnly_Audit_Report.md` |
-| Simulated-tested (host) | **Có** — 46/46 test harness chạy được PASS (2 NOT RUN theo thiết kế), 13/13 test lifecycle PASS, 19/19 mutation bị phát hiện | `M1_Test_Report.md`, `Tests/host/results/` |
+| Simulated-tested (host) | **Có** — 60/60 test harness chạy được PASS (2 NOT RUN theo thiết kế), 20/20 test lifecycle PASS, 26/26 mutation bị phát hiện | `M1_Test_Report.md`, `Tests/host/results/` |
 | MT5-tested | **NOT RUN** — cần bạn compile và chạy harness trên MT5 | `M1_Installation_Guide.md` §5 |
 | Live-account-validated | **NOT RUN** | `M1_Installation_Guide.md` §6 |
 
@@ -27,7 +27,11 @@
 | `Include/Validation/DataValidator.mqh` | `CDataValidator` (4 method nguyên văn), thuần, deterministic, quy tắc Q-02 |
 | `Include/Core/AccountEngine.mqh` | `CAccountDataSource`, `CTerminalAccountDataSource` (nơi duy nhất gọi API tài khoản/terminal), `CAccountEngine` (4 method nguyên văn) |
 | `Include/Core/CoreEngine.mqh` | `RiskManagementConfig`, `RMValidateConfig`, `CCoreEngine` (6 method nguyên văn), identity, kết nối, chống spam log |
-| `Tests/RiskManagement_M1_Tests.mq5` | Test harness MQL5 (EA): F001–F030 + T01–T18, chỉ dùng dữ liệu giả lập |
+| `Include/Models/RiskEvent.mqh` | Sự kiện chuyển trạng thái có cấu trúc + `CRiskEventListener` (Telegram add-on) |
+| `Include/Notify/HttpTransport.mqh` | `CHttpTransport`, `CWebRequestTransport` (nơi duy nhất gọi `WebRequest`) |
+| `Include/Notify/TelegramNotifier.mqh` | `CTelegramNotifier`: kiểm tra input, hàng đợi, gộp tin, back-off, xử lý lỗi HTTP |
+| `Include/Notify/TelegramMessagesVi.mqh` | Toàn bộ nội dung tin nhắn tiếng Việt (UTF-8 có BOM) |
+| `Tests/RiskManagement_M1_Tests.mq5` | Test harness MQL5 (EA): F001–F030 + T01–T18 + N01–N14, chỉ dùng dữ liệu giả lập |
 | `Tests/host/*` | Shim MQL5 cho C++, test lifecycle entry point, mutation check, kết quả |
 | `Tools/readonly_audit.py`, `Tools/readonly_audit_selftest.py` | Audit read-only tự động + tự kiểm tra của audit |
 
@@ -127,3 +131,16 @@ Nếu MetaEditor báo bất kỳ error/warning nào, gửi lại toàn bộ tab 
 | 8 | Timer lifecycle đúng | Host-simulated PASS (E01–E05); nhịp timer thực **NOT RUN** |
 | 9 | Không có thao tác giao dịch | **PASS** — audit tự động + self-test 17/17 + build host thiếu toàn bộ API giao dịch |
 | 10 | Modular, đúng data contract | Static-reviewed — PASS |
+
+## 9. Rev2 — Thông báo Telegram tiếng Việt (thay đổi đặc tả D-27)
+
+| Hạng mục | Nội dung |
+|---|---|
+| Kích hoạt | `InpTelegramEnable=false` mặc định; khi bật phải có token + chat_id hợp lệ, sai → `INIT_PARAMETERS_INCORRECT` |
+| Sự kiện gửi | Chính các chuyển trạng thái đã log (không thêm logic mới): khởi động / thất bại / dừng, mất / có lại kết nối, dữ liệu lỗi / phục hồi, đổi tài khoản; tóm tắt định kỳ tùy chọn |
+| Chống trùng | Sự kiện trong lần thu thập đầu được gộp vào tin "EA đã khởi động"; lỗi do mất kết nối không gửi lặp với tin mất kết nối |
+| Gửi | Hàng đợi 50 tin, gộp nhiều tin vào 1 request (≤ 3500 ký tự), tối đa 1 request mỗi chu kỳ sau khi làm mới; khi dừng EA gửi nốt (timeout ≤ 3 s) |
+| Lỗi | Back-off 10 s → 300 s; HTTP 429 theo `retry_after`; HTTP 400/401/403/404 tắt Telegram tới khi restart; lỗi 4014 hướng dẫn thêm URL; mỗi nguyên nhân log 1 lần (`TELEGRAM_SEND_FAILED` / `TELEGRAM_SEND_RECOVERED`) |
+| Bảo mật | Token không bao giờ xuất hiện trong log; chỉ gửi đi, không nhận lệnh; URL duy nhất `https://api.telegram.org` (audit kiểm tra) |
+| Giới hạn | `WebRequest` đồng bộ: mỗi lần gửi có thể làm chu kỳ kế tiếp trễ tối đa `InpTelegramTimeoutMs`; không chạy trong Strategy Tester; tài liệu Bot API (`core.telegram.org`) không truy cập được từ môi trường này → định dạng `sendMessage`/`retry_after` dựa trên Bot API ổn định lâu năm, cần xác nhận bằng bước kiểm tra trong `Telegram_Setup_Guide.md` §6 |
+| Rủi ro compile riêng | Truyền mảng `char[]` cho `StringToCharArray`/`CharArrayToString` (cách dùng phổ biến với `WebRequest`); file UTF-8 có BOM chứa tiếng Việt (test N01 kiểm tra MetaEditor đọc đúng) |
